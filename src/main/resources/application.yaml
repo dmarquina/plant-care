@@ -1,0 +1,15 @@
+spring:
+  datasource:
+    url: jdbc:mysql://localhost:3306/plant_care?useSSL=false
+    username: root
+    password: damr.1992
+    driver-class-name: com.mysql.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      generate-ddl: true
+    show-sql: true
+
+aws_access_key: ${AWS_ACCESS_KEY}
+aws_secret_key: ${AWS_SECRET_ACCESS_KEY}
