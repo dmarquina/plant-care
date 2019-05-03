@@ -44,6 +44,7 @@ public class PlantServiceImpl implements PlantService {
     Plant plantCreated = new Plant();
     BeanUtils.copyProperties(plantRepository.save(plant),plantCreated);
     plantCreated.getReminders().stream().forEach(reminder -> {
+      reminder.setPostponedDays(0);
       reminderService.create(reminder);
     });
     return plantCreated;
