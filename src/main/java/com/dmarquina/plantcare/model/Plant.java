@@ -1,29 +1,38 @@
 package com.dmarquina.plantcare.model;
 
-import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-@Entity
-@Table(name = "plantcare")
+@EqualsAndHashCode(exclude = "reminders")
 @Data
+@Entity
+@ToString
+@Table(name = "plant")
 public class Plant {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
-  private String userId;
+  private String ownerId;
   private String name;
   private String image;
-  private Long minWateringDays;
-  private Long maxWateringDays;
-  private LocalDate lastDayWatering;
+  @OneToMany(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "idPlant")
+  private Set<Reminder> reminders = new HashSet<>();
 
   public Plant() {
   }
+
 }

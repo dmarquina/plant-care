@@ -4,10 +4,12 @@ import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.repository.PlantRepository;
 import com.dmarquina.plantcare.service.AmazonService;
 import com.dmarquina.plantcare.service.PlantService;
+import com.dmarquina.plantcare.service.ReminderService;
 
 import java.time.LocalDate;
 import java.util.List;
 
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,9 +25,12 @@ public class PlantServiceImpl implements PlantService {
   @Autowired
   AmazonService amazonService;
 
+  @Autowired
+  ReminderService reminderService;
+
   @Override
-  public List<Plant> findAllMyPlants(String userId) {
-    return plantRepository.findAllByUserIdOrderByIdDesc(userId);
+  public List<Plant> findAllMyPlants(String ownerId) {
+    return plantRepository.getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(ownerId);
   }
 
   @Override
@@ -36,7 +41,12 @@ public class PlantServiceImpl implements PlantService {
   @Override
   @Transactional
   public Plant create(Plant plant) {
-    return plantRepository.save(plant);
+    Plant plantCreated = new Plant();
+    BeanUtils.copyProperties(plantRepository.save(plant),plantCreated);
+    plantCreated.getReminders().stream().forEach(reminder -> {
+      reminderService.create(reminder);
+    });
+    return plantCreated;
   }
 
   @Override
@@ -45,13 +55,6 @@ public class PlantServiceImpl implements PlantService {
     return plantRepository.save(plant);
   }
 
-  @Override
-  @Transactional
-  public Plant updateLastDayWatering(Long id, LocalDate lastDayWatering) {
-    Plant plant = plantRepository.getOne(id);
-    plant.setLastDayWatering(lastDayWatering);
-    return plantRepository.save(plant);
-  }
 
   @Override
   @Transactional
