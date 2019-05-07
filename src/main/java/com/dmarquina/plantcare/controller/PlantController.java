@@ -1,7 +1,6 @@
 package com.dmarquina.plantcare.controller;
 
 import com.dmarquina.plantcare.dto.request.NewPlantRequest;
-import com.dmarquina.plantcare.dto.request.UpdatePlantRequest;
 import com.dmarquina.plantcare.dto.response.PlantResponse;
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.service.PlantService;
@@ -29,7 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Api(tags = "Plantas")
 @RestController
-@RequestMapping("/plant")
+@RequestMapping("/plants")
 public class PlantController {
 
   @Autowired
@@ -39,7 +38,7 @@ public class PlantController {
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Plantas listadas correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
-  @GetMapping(value = "/user/{ownerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @GetMapping(value = "/users/{ownerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public List<PlantResponse> findAllPlants(@PathVariable String ownerId) {
     return plantService.findAllMyPlants(ownerId)
         .stream()
@@ -72,20 +71,20 @@ public class PlantController {
     PlantResponse plantResponse = new PlantResponse(plantCreated);
     return plantResponse;
   }
-
-  @ApiOperation(value = "Actualizar una  planta  por id",
-      notes = "Servicio para actualizar una planta ")
-  @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  actualizada correctamente"),
-      @ApiResponse(code = 400, message = "Solicitud inválida"),
-      @ApiResponse(code = 500, message = "Error en el servidor") })
-  @PutMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public PlantResponse updatePlant(@RequestBody UpdatePlantRequest updatePlantRequest) {
-    Plant updatePlant = new Plant();
-    BeanUtils.copyProperties(updatePlantRequest, updatePlant);
-    Plant plantUpdated = plantService.update(updatePlant);
-    PlantResponse plantResponse = new PlantResponse(plantUpdated);
-    return plantResponse;
-  }
+//
+//  @ApiOperation(value = "Actualizar una  planta  por id",
+//      notes = "Servicio para actualizar una planta ")
+//  @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  actualizada correctamente"),
+//      @ApiResponse(code = 400, message = "Solicitud inválida"),
+//      @ApiResponse(code = 500, message = "Error en el servidor") })
+//  @PutMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+//  public PlantResponse updatePlant(@RequestBody UpdatePlantRequest updatePlantRequest) {
+//    Plant updatePlant = new Plant();
+//    BeanUtils.copyProperties(updatePlantRequest, updatePlant);
+//    Plant plantUpdated = plantService.update(updatePlant);
+//    PlantResponse plantResponse = new PlantResponse(plantUpdated);
+//    return plantResponse;
+//  }
 
   @ApiOperation(value = "Agregar una imagen de planta ",
       notes = "Servicio para agregar una imagen de una planta ")
@@ -99,25 +98,4 @@ public class PlantController {
     PlantResponse plantResponse = new PlantResponse(plantUpdated);
     return plantResponse;
   }
-
-//  @ApiOperation(value = "Actualizar último día de riego",
-//      notes = "Servicio para Actualizar último día de riego")
-//  @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta actualizada correctamente"),
-//      @ApiResponse(code = 400, message = "Solicitud inválida"),
-//      @ApiResponse(code = 500, message = "Error en el servidor") })
-//  @PatchMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-//  public PlantResponse waterPlant(@PathVariable Long id,
-//      @RequestBody UpdateLastDayWateringRequest newLastDayWatered) {
-//    Plant plantPatched =
-//        plantService.updateLastDayWatering(id, newLastDayWatered.getLastDayWatering());
-//
-//    PlantResponse plantResponse = new PlantResponse();
-//
-//    BeanUtils.copyProperties(plantPatched, plantResponse);
-//    plantResponse.setDaysSinceLastDayWatering(
-//        DateUtil.getDaysSinceLastWatering(plantPatched.getLastDayWatering()));
-//
-//    return plantResponse;
-//  }
-
 }

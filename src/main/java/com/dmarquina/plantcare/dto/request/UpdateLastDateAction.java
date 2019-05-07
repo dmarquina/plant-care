@@ -5,6 +5,6 @@ import java.time.LocalDate;
 import lombok.Data;
 
 @Data
-public class UpdateLastDayWateringRequest {
-  LocalDate lastDayWatering;
+public class UpdateLastDateAction {
+  LocalDate lastDateAction;
 }

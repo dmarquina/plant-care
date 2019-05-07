@@ -11,15 +11,20 @@ public class ReminderResponse {
   private String name;
   private long frequencyDays;
   private long postponedDays;
+  private long daysWithoutAction;
   private long daysRemainingForAction;
 
-  private LocalDate lastDayAction;
+  private LocalDate lastDateAction;
 
   public long getDaysRemainingForAction() {
-    LocalDate dateToAct = lastDayAction.plusDays(frequencyDays)
+    LocalDate dateToAct = lastDateAction.plusDays(frequencyDays)
         .plusDays(postponedDays);
 
     return LocalDate.now()
         .until(dateToAct, ChronoUnit.DAYS);
+  }
+
+  public long getDaysWithoutAction() {
+    return lastDateAction.until(LocalDate.now(), ChronoUnit.DAYS);
   }
 }

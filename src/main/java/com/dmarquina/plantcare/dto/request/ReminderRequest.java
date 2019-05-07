@@ -11,7 +11,7 @@ public class ReminderRequest {
   private String name;
   private long frequencyDays;
   private long postponedDays;
-  private LocalDate lastDayAction;
+  private LocalDate lastDateAction;
 
 
 }
