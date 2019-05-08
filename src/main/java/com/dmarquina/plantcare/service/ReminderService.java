@@ -10,6 +10,6 @@ public interface ReminderService {
 
   int updateLastDateAction(Long id,LocalDate newLastActionDate);
 
-  int updatePostponedDays(Long id, long daysToPostpone);
+  int updatePostponedDays(Long id, Long daysToPostpone);
 
 }
