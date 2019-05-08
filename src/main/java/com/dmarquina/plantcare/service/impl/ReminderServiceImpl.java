@@ -26,7 +26,8 @@ public class ReminderServiceImpl implements ReminderService {
   @Override
   @Transactional
   public int updateLastDateAction(Long id,LocalDate updateLastActionDate) {
-    return reminderRepository.updateLastDateAction(id,updateLastActionDate);
+    int postponedDays = 0;
+    return reminderRepository.updateLastDateAction(id,updateLastActionDate,postponedDays);
   }
 
   @Override
