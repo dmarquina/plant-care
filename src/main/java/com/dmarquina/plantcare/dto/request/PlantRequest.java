@@ -11,9 +11,12 @@ import lombok.Data;
 import org.springframework.beans.BeanUtils;
 
 @Data
-public class NewPlantRequest {
+public class PlantRequest {
+
+  private long id;
   private String ownerId;
   private String name;
+  private String image;
   private List<ReminderRequest> reminders;
 
   public Set<Reminder> getReminders() {

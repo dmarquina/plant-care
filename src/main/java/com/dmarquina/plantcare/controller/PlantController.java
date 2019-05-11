@@ -1,6 +1,6 @@
 package com.dmarquina.plantcare.controller;
 
-import com.dmarquina.plantcare.dto.request.NewPlantRequest;
+import com.dmarquina.plantcare.dto.request.PlantRequest;
 import com.dmarquina.plantcare.dto.response.PlantResponse;
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.service.PlantService;
@@ -15,7 +15,9 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -39,11 +41,11 @@ public class PlantController {
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @GetMapping(value = "/users/{ownerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public List<PlantResponse> findAllPlants(@PathVariable String ownerId) {
-    return plantService.findAllMyPlants(ownerId)
-        .stream()
-        .map(PlantResponse::new)
-        .collect(Collectors.toList());
+  public ResponseEntity<List<PlantResponse>> findAllPlants(@PathVariable String ownerId) {
+    return ResponseEntity.ok(plantService.findAllMyPlants(ownerId)
+                                 .stream()
+                                 .map(PlantResponse::new)
+                                 .collect(Collectors.toList()));
   }
 
   @ApiOperation(value = "Obtiene la planta  por id",
@@ -52,10 +54,14 @@ public class PlantController {
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public PlantResponse plantById(@PathVariable Long id) {
+  public ResponseEntity<PlantResponse> plantById(@PathVariable Long id) {
     Plant plantFound = plantService.findById(id);
-    PlantResponse plantResponse = new PlantResponse(plantFound);
-    return plantResponse;
+    if (plantFound != null) {
+      PlantResponse plantResponse = new PlantResponse(plantFound);
+      return ResponseEntity.ok(plantResponse);
+    } else {
+      return new ResponseEntity(HttpStatus.NO_CONTENT);
+    }
   }
 
   @ApiOperation(value = "Crear planta ", notes = "Servicio para crear una nueva planta ")
@@ -63,28 +69,29 @@ public class PlantController {
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public PlantResponse createPlant(@RequestBody NewPlantRequest newPlantRequest) {
+  public ResponseEntity<PlantResponse> createPlant(@RequestBody PlantRequest plantRequest) {
     Plant newPlant = new Plant();
-    BeanUtils.copyProperties(newPlantRequest, newPlant);
-    newPlant.setReminders(newPlantRequest.getReminders());
+    BeanUtils.copyProperties(plantRequest, newPlant);
+    newPlant.setReminders(plantRequest.getReminders());
     Plant plantCreated = plantService.create(newPlant);
     PlantResponse plantResponse = new PlantResponse(plantCreated);
-    return plantResponse;
+    return ResponseEntity.ok(plantResponse);
   }
-//
-//  @ApiOperation(value = "Actualizar una  planta  por id",
-//      notes = "Servicio para actualizar una planta ")
-//  @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  actualizada correctamente"),
-//      @ApiResponse(code = 400, message = "Solicitud inválida"),
-//      @ApiResponse(code = 500, message = "Error en el servidor") })
-//  @PutMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-//  public PlantResponse updatePlant(@RequestBody UpdatePlantRequest updatePlantRequest) {
-//    Plant updatePlant = new Plant();
-//    BeanUtils.copyProperties(updatePlantRequest, updatePlant);
-//    Plant plantUpdated = plantService.update(updatePlant);
-//    PlantResponse plantResponse = new PlantResponse(plantUpdated);
-//    return plantResponse;
-//  }
+
+  @ApiOperation(value = "Actualizar una  planta  por id",
+      notes = "Servicio para actualizar una planta ")
+  @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  actualizada correctamente"),
+      @ApiResponse(code = 400, message = "Solicitud inválida"),
+      @ApiResponse(code = 500, message = "Error en el servidor") })
+  @PutMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<PlantResponse> updatePlant(@RequestBody PlantRequest plantRequest) {
+    Plant plantToUpdate = new Plant();
+    BeanUtils.copyProperties(plantRequest, plantToUpdate);
+    plantToUpdate.setReminders(plantRequest.getReminders());
+    Plant plantUpdated = plantService.update(plantToUpdate);
+    PlantResponse plantResponse = new PlantResponse(plantUpdated);
+    return ResponseEntity.ok(plantResponse);
+  }
 
   @ApiOperation(value = "Agregar una imagen de planta ",
       notes = "Servicio para agregar una imagen de una planta ")
@@ -92,10 +99,10 @@ public class PlantController {
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/image", headers = ("Content-Type=multipart/form-data"))
-  public PlantResponse uploadPlantImage(@RequestParam() Long id,
+  public ResponseEntity<PlantResponse> uploadPlantImage(@RequestParam() Long id,
       @RequestParam("image") MultipartFile multipartFile) {
     Plant plantUpdated = plantService.updateImagePlant(id, multipartFile);
     PlantResponse plantResponse = new PlantResponse(plantUpdated);
-    return plantResponse;
+    return ResponseEntity.ok(plantResponse);
   }
 }

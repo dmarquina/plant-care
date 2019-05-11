@@ -7,7 +7,7 @@ import lombok.Data;
 
 @Data
 public class ReminderRequest {
-  private Long id;
+//  private Long id;
   private String name;
   private long frequencyDays;
   private long postponedDays;

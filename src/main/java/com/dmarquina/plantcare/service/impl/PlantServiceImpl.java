@@ -8,6 +8,9 @@ import com.dmarquina.plantcare.service.ReminderService;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
+import javax.swing.text.html.Option;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +38,12 @@ public class PlantServiceImpl implements PlantService {
 
   @Override
   public Plant findById(Long id) {
-    return plantRepository.findById(id).get();
+    Optional<Plant> opPlant =plantRepository.findById(id);
+    if(opPlant.isPresent()){
+      return plantRepository.findById(id).get();
+    }else{
+      return null;
+    }
   }
 
   @Override
@@ -53,7 +61,8 @@ public class PlantServiceImpl implements PlantService {
   @Override
   @Transactional
   public Plant update(Plant plant) {
-    return plantRepository.save(plant);
+//    return plantRepository.save(plant);
+    return null;
   }
 
 
