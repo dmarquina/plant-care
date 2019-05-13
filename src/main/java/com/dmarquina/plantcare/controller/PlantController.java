@@ -13,11 +13,14 @@ import io.swagger.annotations.ApiResponses;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,7 +72,7 @@ public class PlantController {
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<PlantResponse> createPlant(@RequestBody PlantRequest plantRequest) {
+  public ResponseEntity<PlantResponse> createPlant(@RequestBody @Valid PlantRequest plantRequest) {
     Plant newPlant = new Plant();
     BeanUtils.copyProperties(plantRequest, newPlant);
     newPlant.setReminders(plantRequest.getReminders());
@@ -88,9 +91,20 @@ public class PlantController {
     Plant plantToUpdate = new Plant();
     BeanUtils.copyProperties(plantRequest, plantToUpdate);
     plantToUpdate.setReminders(plantRequest.getReminders());
-    Plant plantUpdated = plantService.update(plantToUpdate);
+    Plant plantUpdated = plantService.update(plantToUpdate, plantRequest.getRemindersToDelete());
     PlantResponse plantResponse = new PlantResponse(plantUpdated);
     return ResponseEntity.ok(plantResponse);
+  }
+
+  @ApiOperation(value = "Eliminar una  planta  por id",
+      notes = "Servicio para eliminar una planta ")
+  @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  eliminada correctamente"),
+      @ApiResponse(code = 400, message = "Solicitud inválida"),
+      @ApiResponse(code = 500, message = "Error en el servidor") })
+  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<?> deletePlant(@PathVariable Long id) {
+    plantService.delete(id);
+    return new ResponseEntity(HttpStatus.OK);
   }
 
   @ApiOperation(value = "Agregar una imagen de planta ",
@@ -99,10 +113,22 @@ public class PlantController {
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/image", headers = ("Content-Type=multipart/form-data"))
-  public ResponseEntity<PlantResponse> uploadPlantImage(@RequestParam() Long id,
+  public ResponseEntity<PlantResponse> addPlantImage(@RequestParam Long id,
       @RequestParam("image") MultipartFile multipartFile) {
-    Plant plantUpdated = plantService.updateImagePlant(id, multipartFile);
+    Plant plantUpdated = plantService.addImagePlant(id, multipartFile);
     PlantResponse plantResponse = new PlantResponse(plantUpdated);
     return ResponseEntity.ok(plantResponse);
+  }
+
+  @ApiOperation(value = "Actualizar la imagen de la planta ",
+      notes = "Servicio para actualizar la imagen de una planta ")
+  @ApiResponses(value = { @ApiResponse(code = 201, message = "Imagen actualizada correctamente"),
+      @ApiResponse(code = 400, message = "Solicitud inválida"),
+      @ApiResponse(code = 500, message = "Error en el servidor") })
+  @PostMapping(value = "/updatedimage", headers = ("Content-Type=multipart/form-data"))
+  public ResponseEntity<?> updatePlantImage(@RequestParam Long id, @RequestParam String imageURL,
+      @RequestParam("image") MultipartFile multipartFile) {
+    plantService.updateImagePlant(id, imageURL, multipartFile);
+    return new ResponseEntity(HttpStatus.OK);
   }
 }

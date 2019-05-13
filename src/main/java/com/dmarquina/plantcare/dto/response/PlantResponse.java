@@ -2,6 +2,7 @@ package com.dmarquina.plantcare.dto.response;
 
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.model.Reminder;
+import com.dmarquina.plantcare.util.Constants;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,5 +32,9 @@ public class PlantResponse {
           return rr;
         })
         .collect(Collectors.toSet());
+  }
+
+  public String getImage() {
+    return Constants.getImageURL(image);
   }
 }

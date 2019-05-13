@@ -8,6 +8,8 @@ public interface ReminderService {
 
   Reminder create(Reminder reminder);
 
+  void deleteById(long reminderId);
+
   int updateLastDateAction(Long id,LocalDate newLastActionDate);
 
   int updatePostponedDays(Long id, Long daysToPostpone);

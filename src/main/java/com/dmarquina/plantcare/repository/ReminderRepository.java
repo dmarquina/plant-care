@@ -12,11 +12,11 @@ import org.springframework.data.repository.query.Param;
 public interface ReminderRepository extends JpaRepository<Reminder, Long> {
   @Modifying
   @Query(
-      "update Reminder r set r.lastDateAction = :lastDateAction, r.postponedDays = :postponedDays where r.id = :id")
+      "UPDATE Reminder r SET r.lastDateAction = :lastDateAction, r.postponedDays = :postponedDays WHERE r.id = :id")
   int updateLastDateAction(@Param("id") Long id, @Param("lastDateAction") LocalDate lastDateAction,
       @Param("postponedDays") Long postponedDays);
 
   @Modifying
-  @Query("update Reminder r set r.postponedDays = :postponedDays where r.id = :id")
+  @Query("UPDATE Reminder r SET r.postponedDays = :postponedDays WHERE r.id = :id")
   int updatePostponedDays(@Param("id") Long id, @Param("postponedDays") Long postponedDays);
 }

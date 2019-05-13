@@ -15,7 +15,11 @@ public interface PlantService {
 
   Plant create(Plant plant);
 
-  Plant update(Plant plant);
+  Plant update(Plant plant,List<Long> remindersToDelete);
 
-  Plant updateImagePlant(Long id, MultipartFile newImage);
+  void delete(Long id);
+
+  Plant addImagePlant(Long id, MultipartFile newImage);
+
+  int updateImagePlant(Long id,String imageURL, MultipartFile newImage);
 }

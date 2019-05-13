@@ -28,7 +28,7 @@ public class Plant {
   private String ownerId;
   private String name;
   private String image;
-  @OneToMany(cascade = CascadeType.REMOVE)
+  @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "idPlant")
   private Set<Reminder> reminders = new HashSet<>();
 

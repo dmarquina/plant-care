@@ -5,14 +5,14 @@ import com.dmarquina.plantcare.repository.PlantRepository;
 import com.dmarquina.plantcare.service.AmazonService;
 import com.dmarquina.plantcare.service.PlantService;
 import com.dmarquina.plantcare.service.ReminderService;
+import com.dmarquina.plantcare.util.Constants;
+import com.dmarquina.plantcare.util.exceptionhandler.AmazonException;
+import com.dmarquina.plantcare.util.exceptionhandler.PlantNotFoundException;
+import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import javax.swing.text.html.Option;
-
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,45 +38,100 @@ public class PlantServiceImpl implements PlantService {
 
   @Override
   public Plant findById(Long id) {
-    Optional<Plant> opPlant =plantRepository.findById(id);
-    if(opPlant.isPresent()){
-      return plantRepository.findById(id).get();
-    }else{
-      return null;
+    Optional<Plant> opPlant = plantRepository.findById(id);
+    if (opPlant.isPresent()) {
+      return plantRepository.findById(id)
+          .get();
+    } else {
+      throw new PlantNotFoundException("No se encontró la planta.");
+
     }
   }
 
   @Override
   @Transactional
   public Plant create(Plant plant) {
-    Plant plantCreated = new Plant();
-    BeanUtils.copyProperties(plantRepository.save(plant),plantCreated);
-    plantCreated.getReminders().stream().forEach(reminder -> {
-      reminder.setPostponedDays(0);
-      reminderService.create(reminder);
-    });
-    return plantCreated;
-  }
-
-  @Override
-  @Transactional
-  public Plant update(Plant plant) {
-//    return plantRepository.save(plant);
-    return null;
-  }
-
-
-  @Override
-  @Transactional
-  public Plant updateImagePlant(Long id, MultipartFile newImage) {
     try {
-      //TODO: Validar si existe o no
-      Plant plantFound = plantRepository.findById(id).get();
-      plantFound.setImage(amazonService.uploadFile(id, newImage));
-      return plantRepository.save(plantFound);
+      return plantRepository.save(plant);
+    } catch (Exception e) {
+      throw new PlantServerErrorException("Hubo un error interno al crear la planta.");
+    }
+  }
+
+  @Override
+  @Transactional
+  public Plant update(Plant plant, List<Long> remindersToDelete) {
+    if (!remindersToDelete.isEmpty()) {
+      remindersToDelete.stream()
+          .forEach(reminderService::deleteById);
+    }
+    return plantRepository.save(plant);
+  }
+
+  @Override
+  @Transactional
+  public void delete(Long id) {
+    Optional<Plant> opPlant = plantRepository.findById(id);
+    if (opPlant.isPresent()) {
+      Plant plantFound = opPlant.get();
+    try {
+      amazonService.deleteFile(plantFound.getImage());
     } catch (Exception e) {
       e.printStackTrace();
-      return null;
+      throw new AmazonException("Hubo un problema al eliminar la imagen.");
+    }
+    try {
+      plantRepository.deleteById(id);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new PlantServerErrorException("Hubo un error interno al eliminar la planta.");
+    }
+    } else {
+      throw new PlantNotFoundException("Esta planta no existe.");
+    }
+  }
+
+  @Override
+  @Transactional
+  public Plant addImagePlant(Long id, MultipartFile newImage) {
+    Optional<Plant> opPlant = plantRepository.findById(id);
+    if (opPlant.isPresent()) {
+      Plant plantFound = opPlant.get();
+      try {
+        plantFound.setImage(amazonService.uploadFile(id, newImage));
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new AmazonException("Hubo un problema al subir la imagen.");
+      }
+      try {
+        return plantRepository.save(plantFound);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new PlantServerErrorException(
+            "Hubo un error interno al actualizar la imagen en la planta.");
+      }
+    } else {
+      throw new PlantNotFoundException("No se encontró la planta.");
+    }
+  }
+
+  @Override
+  @Transactional
+  public int updateImagePlant(Long id, String imageURL, MultipartFile newImage) {
+    String newImageName;
+    try {
+      amazonService.deleteFile(Constants.getImageNameFromURL(imageURL));
+      newImageName = amazonService.uploadFile(id, newImage);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new AmazonException("Hubo un problema al actualizar la imagen.");
+    }
+    try {
+      return plantRepository.updatePlantImage(id, newImageName);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new PlantServerErrorException(
+          "Hubo un error interno al actualizar la imagen en la planta.");
     }
   }
 }
