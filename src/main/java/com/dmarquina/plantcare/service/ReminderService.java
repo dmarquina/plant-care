@@ -3,6 +3,7 @@ package com.dmarquina.plantcare.service;
 import com.dmarquina.plantcare.model.Reminder;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface ReminderService {
 
@@ -10,8 +11,8 @@ public interface ReminderService {
 
   void deleteById(long reminderId);
 
-  int updateLastDateAction(Long id,LocalDate newLastActionDate);
+  int updateLastDateAction(List<Long> ids,LocalDate newLastActionDate);
 
-  int updatePostponedDays(Long id, Long daysToPostpone);
+  int updatePostponedDays(List<Long> ids, Long daysToPostpone);
 
 }

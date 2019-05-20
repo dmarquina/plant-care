@@ -56,7 +56,7 @@ public class AmazonServiceImpl implements AmazonService {
 
   @Override
   public void deleteFile(String fileName) {
-    amazonS3.deleteObject(new DeleteObjectRequest(Constants.AWS_BUCKET_NAME, fileName));
+    amazonS3.deleteObject(Constants.AWS_BUCKET_NAME, fileName);
   }
 
   private File convertMultipartToFile(MultipartFile multipartFile) throws IOException {

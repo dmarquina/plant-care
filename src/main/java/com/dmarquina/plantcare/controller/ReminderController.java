@@ -26,17 +26,18 @@ public class ReminderController {
   @Autowired
   ReminderService reminderService;
 
-  @PatchMapping("/{id}/lastdateaction")
-  public ResponseEntity<?> updateLastDateAction(@PathVariable("id") Long id,
+  @PatchMapping("/lastdateaction")
+  public ResponseEntity<?> updateLastDateAction(
       @RequestBody UpdateLastDateAction updateLastDateAction) {
-    reminderService.updateLastDateAction(id, updateLastDateAction.getLastDateAction());
+    reminderService.updateLastDateAction(updateLastDateAction.getReminderIds(),
+                                         updateLastDateAction.getLastDateAction());
     return ResponseEntity.ok("resource address updated");
   }
 
-  @PatchMapping("/{id}/postponeddays")
-  public ResponseEntity<?> updatePostponedDays(@PathVariable("id") Long id,
+  @PatchMapping("/postponeddays")
+  public ResponseEntity<?> updatePostponedDays(
       @RequestBody UpdatePostponedDays updatePostponedDays) {
-    reminderService.updatePostponedDays(id, updatePostponedDays.getPostponedDays());
+    reminderService.updatePostponedDays(updatePostponedDays.getReminderIds(), updatePostponedDays.getPostponedDays());
     return ResponseEntity.ok("resource address updated");
   }
 }

@@ -5,6 +5,7 @@ import com.dmarquina.plantcare.repository.ReminderRepository;
 import com.dmarquina.plantcare.service.ReminderService;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -31,15 +32,15 @@ public class ReminderServiceImpl implements ReminderService {
 
   @Override
   @Transactional
-  public int updateLastDateAction(Long id,LocalDate updateLastActionDate) {
+  public int updateLastDateAction(List<Long> ids,LocalDate updateLastActionDate) {
     long postponedDays = 0;
-    return reminderRepository.updateLastDateAction(id,updateLastActionDate,postponedDays);
+    return reminderRepository.updateLastDateAction(ids,updateLastActionDate,postponedDays);
   }
 
   @Override
   @Transactional
-  public int updatePostponedDays(Long id, Long daysToPostpone) {
-    return reminderRepository.updatePostponedDays(id,daysToPostpone);
+  public int updatePostponedDays(List<Long> ids, Long daysToPostpone) {
+    return reminderRepository.updatePostponedDays(ids,daysToPostpone);
   }
 
 
