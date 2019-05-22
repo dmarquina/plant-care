@@ -4,7 +4,6 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
-import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.dmarquina.plantcare.service.AmazonService;
 import com.dmarquina.plantcare.util.Constants;
@@ -14,7 +13,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
@@ -38,13 +36,13 @@ public class AmazonServiceImpl implements AmazonService {
   }
 
   @Override
-  public String uploadFile(Long plantId, MultipartFile multipartFile) {
+  public String uploadFile(Long plantId, String ownerId, MultipartFile multipartFile) {
     String fileName = "";
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
     String dateName = dateFormat.format(new Date());
     try {
       File file = convertMultipartToFile(multipartFile);
-      fileName = plantId.toString() + "-" + dateName;
+      fileName = ownerId + "-" + plantId.toString() + "-" + dateName;
       amazonS3.putObject(
           new PutObjectRequest(Constants.AWS_BUCKET_NAME, fileName, file).withCannedAcl(
               CannedAccessControlList.PublicRead));

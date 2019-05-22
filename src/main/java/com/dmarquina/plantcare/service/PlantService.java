@@ -15,11 +15,11 @@ public interface PlantService {
 
   Plant create(Plant plant);
 
-  Plant update(Plant plant,List<Long> remindersToDelete);
+  Plant update(Plant plant, List<Long> remindersToDelete);
 
   void delete(Long id);
 
-  Plant addImagePlant(Long id, MultipartFile newImage);
+  Plant addImagePlant(Long plantId, String ownerId, MultipartFile newImage);
 
-  int updateImagePlant(Long id,String imageURL, MultipartFile newImage);
+  int updateImagePlant(Long plantId, String ownerId, String imageURL, MultipartFile newImage);
 }

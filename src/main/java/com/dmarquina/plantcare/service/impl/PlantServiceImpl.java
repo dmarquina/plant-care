@@ -74,18 +74,20 @@ public class PlantServiceImpl implements PlantService {
     Optional<Plant> opPlant = plantRepository.findById(id);
     if (opPlant.isPresent()) {
       Plant plantFound = opPlant.get();
-    try {
-      amazonService.deleteFile(plantFound.getImage());
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new AmazonException("Hubo un problema al eliminar la imagen.");
-    }
-    try {
-      plantRepository.deleteById(id);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new PlantServerErrorException("Hubo un error interno al eliminar la planta.");
-    }
+      try {
+        plantRepository.deleteById(id);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new PlantServerErrorException("Hubo un error interno al eliminar la planta.");
+      }
+      try {
+        amazonService.deleteFile(plantFound.getImage());
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new AmazonException("Hubo un problema al eliminar la imagen.");
+      } finally {
+
+      }
     } else {
       throw new PlantNotFoundException("Esta planta no existe.");
     }
@@ -93,12 +95,12 @@ public class PlantServiceImpl implements PlantService {
 
   @Override
   @Transactional
-  public Plant addImagePlant(Long id, MultipartFile newImage) {
-    Optional<Plant> opPlant = plantRepository.findById(id);
+  public Plant addImagePlant(Long plantId, String ownerId, MultipartFile newImage) {
+    Optional<Plant> opPlant = plantRepository.findById(plantId);
     if (opPlant.isPresent()) {
       Plant plantFound = opPlant.get();
       try {
-        plantFound.setImage(amazonService.uploadFile(id, newImage));
+        plantFound.setImage(amazonService.uploadFile(plantId, ownerId, newImage));
       } catch (Exception e) {
         e.printStackTrace();
         throw new AmazonException("Hubo un problema al subir la imagen.");
@@ -117,17 +119,18 @@ public class PlantServiceImpl implements PlantService {
 
   @Override
   @Transactional
-  public int updateImagePlant(Long id, String imageURL, MultipartFile newImage) {
+  public int updateImagePlant(Long plantId, String ownerId, String imageURL,
+      MultipartFile newImage) {
     String newImageName;
     try {
       amazonService.deleteFile(Constants.getImageNameFromURL(imageURL));
-      newImageName = amazonService.uploadFile(id, newImage);
+      newImageName = amazonService.uploadFile(plantId, ownerId, newImage);
     } catch (Exception e) {
       e.printStackTrace();
       throw new AmazonException("Hubo un problema al actualizar la imagen.");
     }
     try {
-      return plantRepository.updatePlantImage(id, newImageName);
+      return plantRepository.updatePlantImage(plantId, newImageName);
     } catch (Exception e) {
       e.printStackTrace();
       throw new PlantServerErrorException(

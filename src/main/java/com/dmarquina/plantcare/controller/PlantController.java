@@ -12,7 +12,6 @@ import io.swagger.annotations.ApiResponses;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -113,9 +112,9 @@ public class PlantController {
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/image", headers = ("Content-Type=multipart/form-data"))
-  public ResponseEntity<PlantResponse> addPlantImage(@RequestParam Long id,
-      @RequestParam("image") MultipartFile multipartFile) {
-    Plant plantUpdated = plantService.addImagePlant(id, multipartFile);
+  public ResponseEntity<PlantResponse> addPlantImage(@RequestParam Long plantId,
+      @RequestParam String ownerId, @RequestParam("image") MultipartFile multipartFile) {
+    Plant plantUpdated = plantService.addImagePlant(plantId, ownerId, multipartFile);
     PlantResponse plantResponse = new PlantResponse(plantUpdated);
     return ResponseEntity.ok(plantResponse);
   }
@@ -126,9 +125,10 @@ public class PlantController {
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/updatedimage", headers = ("Content-Type=multipart/form-data"))
-  public ResponseEntity<?> updatePlantImage(@RequestParam Long id, @RequestParam String imageURL,
+  public ResponseEntity<?> updatePlantImage(@RequestParam Long plantId,
+      @RequestParam String ownerId, @RequestParam String imageURL,
       @RequestParam("image") MultipartFile multipartFile) {
-    plantService.updateImagePlant(id, imageURL, multipartFile);
+    plantService.updateImagePlant(plantId, ownerId, imageURL, multipartFile);
     return new ResponseEntity(HttpStatus.OK);
   }
 }
