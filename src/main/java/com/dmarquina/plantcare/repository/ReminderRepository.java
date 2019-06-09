@@ -23,4 +23,11 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
   @Query("UPDATE Reminder r SET r.postponedDays = :postponedDays WHERE r.id IN :ids")
   int updatePostponedDays(@Param("ids") Collection<Long> ids,
       @Param("postponedDays") Long postponedDays);
+
+  @Query(value = "SELECT DISTINCT u.device_token FROM plant_care.plant p "
+      + "JOIN reminder r ON p.id = r.id_plant " + "JOIN plant_care.user u ON u.id = p.owner_id "
+      + "WHERE DATE_ADD(r.last_date_action, INTERVAL r.postponed_days+r.frequency_days DAY) > "
+      + "DATE_FORMAT(NOW(),'%Y-%m-%d')", nativeQuery = true)
+  List<String> getUsersDeviceTokensToRemind();
 }
+
