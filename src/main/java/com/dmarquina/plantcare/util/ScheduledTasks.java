@@ -17,7 +17,7 @@ public class ScheduledTasks {
   @Autowired
   ReminderRepository reminderRepository;
 
-  @Scheduled(cron = "0 0 9 * * ?")
+  @Scheduled(cron = "0 0 9 * * ?",zone = "GMT-5:00")
   public void reportCurrentTime() {
     RestTemplate restTemplate = new RestTemplate();
     List<String> deviceTokensToRemind = reminderRepository.getUsersDeviceTokensToRemind();
