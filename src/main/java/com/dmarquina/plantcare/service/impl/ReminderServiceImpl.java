@@ -1,6 +1,8 @@
 package com.dmarquina.plantcare.service.impl;
 
 import com.dmarquina.plantcare.model.Reminder;
+import com.dmarquina.plantcare.model.ReminderExecuted;
+import com.dmarquina.plantcare.repository.ReminderExecutedRepository;
 import com.dmarquina.plantcare.repository.ReminderRepository;
 import com.dmarquina.plantcare.service.ReminderService;
 
@@ -18,6 +20,9 @@ public class ReminderServiceImpl implements ReminderService {
   @Autowired
   private ReminderRepository reminderRepository;
 
+  @Autowired
+  private ReminderExecutedRepository reminderExecutedRepository;
+
   @Override
   @Transactional
   public Reminder create(Reminder reminder) {
@@ -32,16 +37,18 @@ public class ReminderServiceImpl implements ReminderService {
 
   @Override
   @Transactional
-  public int updateLastDateAction(List<Long> ids,LocalDate updateLastActionDate) {
+  public int updateLastDateAction(List<Long> ids, LocalDate lastActionDate) {
     long postponedDays = 0;
-    return reminderRepository.updateLastDateAction(ids,updateLastActionDate,postponedDays);
+    ids.stream()
+        .forEach(reminderId -> reminderExecutedRepository.save(
+            new ReminderExecuted(reminderId, lastActionDate)));
+    return reminderRepository.updateLastDateAction(ids, lastActionDate, postponedDays);
   }
 
   @Override
   @Transactional
   public int updatePostponedDays(List<Long> ids, Long daysToPostpone) {
-    return reminderRepository.updatePostponedDays(ids,daysToPostpone);
+    return reminderRepository.updatePostponedDays(ids, daysToPostpone);
   }
-
 
 }

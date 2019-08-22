@@ -11,7 +11,7 @@ public interface ReminderService {
 
   void deleteById(long reminderId);
 
-  int updateLastDateAction(List<Long> ids,LocalDate newLastActionDate);
+  int updateLastDateAction(List<Long> ids,LocalDate lastActionDate);
 
   int updatePostponedDays(List<Long> ids, Long daysToPostpone);
 

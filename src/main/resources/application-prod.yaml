@@ -11,5 +11,11 @@ spring:
       generate-ddl: true
     show-sql: true
 
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 2MB
+
 aws_access_key: ${AWS_ACCESS_KEY}
 aws_secret_key: ${AWS_SECRET_ACCESS_KEY}
+
