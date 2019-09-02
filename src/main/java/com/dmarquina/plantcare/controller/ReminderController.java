@@ -6,14 +6,10 @@ import com.dmarquina.plantcare.service.ReminderService;
 
 import io.swagger.annotations.Api;
 
-import java.time.LocalDate;
-import java.util.Map;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +22,8 @@ public class ReminderController {
   @Autowired
   ReminderService reminderService;
 
-  @PatchMapping("/lastdateaction")
+  @PatchMapping(value = "/lastdateaction", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<?> updateLastDateAction(
       @RequestBody UpdateLastDateAction updateLastDateAction) {
     reminderService.updateLastDateAction(updateLastDateAction.getReminderIds(),
@@ -34,10 +31,12 @@ public class ReminderController {
     return ResponseEntity.ok("resource address updated");
   }
 
-  @PatchMapping("/postponeddays")
+  @PatchMapping(value = "/postponeddays", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<?> updatePostponedDays(
       @RequestBody UpdatePostponedDays updatePostponedDays) {
-    reminderService.updatePostponedDays(updatePostponedDays.getReminderIds(), updatePostponedDays.getPostponedDays());
+    reminderService.updatePostponedDays(updatePostponedDays.getReminderIds(),
+                                        updatePostponedDays.getPostponedDays());
     return ResponseEntity.ok("resource address updated");
   }
 }

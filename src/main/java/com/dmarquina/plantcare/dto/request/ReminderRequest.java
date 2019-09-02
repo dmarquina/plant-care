@@ -16,7 +16,9 @@ public class ReminderRequest {
   @Min(value = 1, message = "La frecuencia debe ser de al menos 1 día")
   private long frequencyDays;
   private long postponedDays;
-  @NotEmpty(message = "Es necesario la última fecha de acción")
+  @NotEmpty(message = "Es necesario la ultima fecha de acción")
   private LocalDate lastDateAction;
+  @NotEmpty(message = "Es necesario la fecha de creacón")
+  private LocalDate creationDate;
 
 }

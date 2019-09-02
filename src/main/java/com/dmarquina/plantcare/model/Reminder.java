@@ -20,5 +20,6 @@ public class Reminder {
   private long frequencyDays;
   private long postponedDays;
   private LocalDate lastDateAction;
+  private LocalDate creationDate;
 
 }

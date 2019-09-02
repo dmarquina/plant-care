@@ -12,4 +12,6 @@ public class UserRequest {
   @NotEmpty(message = "Es necesario el token del dispositivo")
   private String deviceToken;
   private String email;
+  private String displayName;
+  private String photoUrl;
 }

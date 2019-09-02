@@ -42,7 +42,8 @@ public class PlantController {
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Plantas listadas correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
-  @GetMapping(value = "/users/{ownerId}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @GetMapping(value = "/users/{ownerId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<List<PlantResponse>> findAllPlants(@PathVariable String ownerId) {
     return ResponseEntity.ok(plantService.findAllMyPlants(ownerId)
                                  .stream()
@@ -55,7 +56,8 @@ public class PlantController {
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  obtenida correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
-  @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @GetMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<PlantResponse> plantById(@PathVariable Long id) {
     Plant plantFound = plantService.findById(id);
     if (plantFound != null) {
@@ -70,7 +72,8 @@ public class PlantController {
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  creada correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
-  @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<PlantResponse> createPlant(@RequestBody @Valid PlantRequest plantRequest) {
     Plant newPlant = new Plant();
     BeanUtils.copyProperties(plantRequest, newPlant);
@@ -85,7 +88,8 @@ public class PlantController {
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  actualizada correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
-  @PutMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @PutMapping(value = "/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<PlantResponse> updatePlant(@RequestBody PlantRequest plantRequest) {
     Plant plantToUpdate = new Plant();
     BeanUtils.copyProperties(plantRequest, plantToUpdate);
@@ -100,7 +104,8 @@ public class PlantController {
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  eliminada correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
-  @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @DeleteMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<?> deletePlant(@PathVariable Long id) {
     plantService.delete(id);
     return new ResponseEntity(HttpStatus.OK);

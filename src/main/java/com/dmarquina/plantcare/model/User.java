@@ -16,4 +16,6 @@ public class User {
   private String id;
   private String deviceToken;
   private String email;
+  private String displayName;
+  private String photoUrl;
 }

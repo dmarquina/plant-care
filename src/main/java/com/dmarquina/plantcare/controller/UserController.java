@@ -33,7 +33,8 @@ public class UserController {
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Usuario creada correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
-  @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<UserResponse> createUpdateUser(
       @RequestBody @Valid UserRequest userRequest) {
     User user = new User();
