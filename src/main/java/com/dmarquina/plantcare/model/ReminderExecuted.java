@@ -14,6 +14,8 @@ import lombok.Data;
 @Table(name = "reminder_executed")
 public class ReminderExecuted {
   @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
   private Long reminderId;
   private LocalDate dateAction;
 
