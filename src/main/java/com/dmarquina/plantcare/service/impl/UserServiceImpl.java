@@ -31,6 +31,18 @@ public class UserServiceImpl implements UserService {
     }
   }
 
+  @Override
+  @Transactional
+  public User getUser(String id) {
+    try {
+      return userRepository.findById(id).get();
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new PlantServerErrorException(
+          "Hubo un error interno al obtener el usuario.");
+    }
+  }
+
   private User setKeepMaxQuantityPlantsAndDisplayName(User user) {
     try {
       User userFound = userRepository.findById(user.getId()).get();

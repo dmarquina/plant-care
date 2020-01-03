@@ -16,6 +16,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -42,6 +44,17 @@ public class UserController {
     User userCreated = userService.createUpdateUser(user);
     UserResponse userResponse = new UserResponse(userCreated);
     return ResponseEntity.ok(userResponse);
+  }
+
+  @ApiOperation(value = "Obtener usuario por id",
+      notes = "Servicio para obtener un usuario por su id")
+  @ApiResponses(value = { @ApiResponse(code = 201, message = "Usuario creada correctamente"),
+      @ApiResponse(code = 400, message = "Solicitud inválida"),
+      @ApiResponse(code = 500, message = "Error en el servidor") })
+  @GetMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
+    return ResponseEntity.ok(new UserResponse(userService.getUser(id)));
   }
 
 }

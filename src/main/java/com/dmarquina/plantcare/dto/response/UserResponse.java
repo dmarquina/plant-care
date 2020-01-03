@@ -12,6 +12,8 @@ public class UserResponse {
   private String deviceToken;
   private String email;
   private int maxQuantityPlants;
+  private String displayName;
+  private String photoUrl;
 
   public UserResponse(User user) {
     BeanUtils.copyProperties(user, this);
