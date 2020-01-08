@@ -116,7 +116,7 @@ public class PlantController {
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Imagen agregada correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
-  @PostMapping(value = "/image", headers = ("Content-Type=multipart/form-data"))
+  @PostMapping(value = "/image", headers = ("Content-Type=multipart/form-data; boundary=dart-http-boundary-s0aYE+od5pHtBVvu+WotKyunZC.-5ZQb38hOUJtu-5RxJ.2z16S"))
   public ResponseEntity<PlantResponse> addPlantImage(@RequestParam Long plantId,
       @RequestParam String ownerId, @RequestParam("image") MultipartFile multipartFile) {
     Plant plantUpdated = plantService.addImagePlant(plantId, ownerId, multipartFile);

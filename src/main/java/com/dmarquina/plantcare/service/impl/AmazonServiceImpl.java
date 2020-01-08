@@ -53,6 +53,18 @@ public class AmazonServiceImpl implements AmazonService {
   }
 
   @Override
+  public String uploadFile2(Long plantId, String ownerId,  File file) {
+    String fileName = "";
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
+    String dateName = dateFormat.format(new Date());
+    fileName = ownerId + "-" + plantId.toString() + "-" + dateName;
+    amazonS3.putObject(
+        new PutObjectRequest(Constants.AWS_BUCKET_NAME, fileName, file).withCannedAcl(
+            CannedAccessControlList.PublicRead));
+    return fileName;
+  }
+
+  @Override
   public void deleteFile(String fileName) {
     amazonS3.deleteObject(Constants.AWS_BUCKET_NAME, fileName);
   }

@@ -10,9 +10,12 @@ import com.dmarquina.plantcare.util.exceptionhandler.AmazonException;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantNotFoundException;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -51,7 +54,14 @@ public class PlantServiceImpl implements PlantService {
   @Override
   @Transactional
   public Plant create(Plant plant) {
+    byte[] decodedBytes = Base64.decodeBase64(plant.getImage());
+    File convertFile = new File("image");
     try {
+      FileOutputStream fos = new FileOutputStream(convertFile);
+      fos.write(decodedBytes);
+      fos.close();
+      String fileName = amazonService.uploadFile2(plant.getId(),plant.getOwnerId(),convertFile);
+      plant.setImage(fileName);
       return plantRepository.save(plant);
     } catch (Exception e) {
       throw new PlantServerErrorException("Hubo un error interno al crear la planta.");
