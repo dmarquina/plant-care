@@ -2,6 +2,7 @@ package com.dmarquina.plantcare.service.impl;
 
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.repository.PlantRepository;
+import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.AmazonService;
 import com.dmarquina.plantcare.service.PlantService;
 import com.dmarquina.plantcare.service.ReminderService;
@@ -19,11 +20,13 @@ import org.apache.commons.codec.binary.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 @Transactional(readOnly = true)
 @Service("plantService")
 public class PlantServiceImpl implements PlantService {
+  //TODO: Logs
+  @Autowired
+  private UserRepository userRepository;
 
   @Autowired
   private PlantRepository plantRepository;
@@ -54,16 +57,27 @@ public class PlantServiceImpl implements PlantService {
   @Override
   @Transactional
   public Plant create(Plant plant) {
-    byte[] decodedBytes = Base64.decodeBase64(plant.getImage());
-    File convertFile = new File("image");
+    validateImage(plant.getImage());
+    File imageFile = createImageToUpload(plant.getImage());
+    plant.setImage("");
+    Plant plantCreated;
     try {
-      FileOutputStream fos = new FileOutputStream(convertFile);
-      fos.write(decodedBytes);
-      fos.close();
-      String fileName = amazonService.uploadFile2(plant.getId(),plant.getOwnerId(),convertFile);
-      plant.setImage(fileName);
-      return plantRepository.save(plant);
+      plantCreated = plantRepository.save(plant);
     } catch (Exception e) {
+      throw new PlantServerErrorException("Hubo un error interno al crear la planta.");
+    }
+    try {
+      String fileName =
+          amazonService.uploadFile(plantCreated.getId(), plantCreated.getOwnerId(), imageFile);
+      plantCreated.setImage(fileName);
+    } catch (Exception e) {
+      plantRepository.deleteById(plantCreated.getId());
+      throw new PlantServerErrorException("Hubo un error interno al subir la imagen de tu planta.");
+    }
+    try {
+      return plantRepository.save(plantCreated);
+    } catch (Exception e) {
+      //TODO: eliminar foto porseacaso
       throw new PlantServerErrorException("Hubo un error interno al crear la planta.");
     }
   }
@@ -71,6 +85,7 @@ public class PlantServiceImpl implements PlantService {
   @Override
   @Transactional
   public Plant update(Plant plant, List<Long> remindersToDelete) {
+    updatePlantImage(plant);
     if (!remindersToDelete.isEmpty()) {
       remindersToDelete.stream()
           .forEach(reminderService::deleteById);
@@ -95,8 +110,6 @@ public class PlantServiceImpl implements PlantService {
       } catch (Exception e) {
         e.printStackTrace();
         throw new AmazonException("Hubo un problema al eliminar la imagen.");
-      } finally {
-
       }
     } else {
       throw new PlantNotFoundException("Esta planta no existe.");
@@ -104,47 +117,50 @@ public class PlantServiceImpl implements PlantService {
   }
 
   @Override
-  @Transactional
-  public Plant addImagePlant(Long plantId, String ownerId, MultipartFile newImage) {
-    Optional<Plant> opPlant = plantRepository.findById(plantId);
-    if (opPlant.isPresent()) {
-      Plant plantFound = opPlant.get();
-      try {
-        plantFound.setImage(amazonService.uploadFile(plantId, ownerId, newImage));
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw new AmazonException("Hubo un problema al subir la imagen.");
-      }
-      try {
-        return plantRepository.save(plantFound);
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw new PlantServerErrorException(
-            "Hubo un error interno al actualizar la imagen en la planta.");
-      }
-    } else {
-      throw new PlantNotFoundException("No se encontró la planta.");
+  public List<Plant> findAllPlants() {
+    return plantRepository.findAll();
+  }
+
+  private void validateImage(String imageFile) {
+    if (imageFile == null || imageFile.equalsIgnoreCase("")) {
+      throw new PlantServerErrorException("Es necesaria la imagen de tu plantita");
     }
   }
 
-  @Override
-  @Transactional
-  public int updateImagePlant(Long plantId, String ownerId, String imageURL,
-      MultipartFile newImage) {
-    String newImageName;
+  private File createImageToUpload(String imageBase64) {
+    byte[] decodedBytes = Base64.decodeBase64(imageBase64);
+    File imageFile = new File("image");
     try {
-      amazonService.deleteFile(Constants.getImageNameFromURL(imageURL));
-      newImageName = amazonService.uploadFile(plantId, ownerId, newImage);
+      FileOutputStream fos = new FileOutputStream(imageFile);
+      fos.write(decodedBytes);
+      fos.close();
+      return imageFile;
     } catch (Exception e) {
       e.printStackTrace();
-      throw new AmazonException("Hubo un problema al actualizar la imagen.");
+      throw new PlantServerErrorException("Error con la imagen de la planta.");
     }
-    try {
-      return plantRepository.updatePlantImage(plantId, newImageName);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw new PlantServerErrorException(
-          "Hubo un error interno al actualizar la imagen en la planta.");
+  }
+
+  private void updatePlantImage(Plant plant) {
+    validateImage(plant.getImage());
+    Optional<Plant> optionalPlant = plantRepository.findById(plant.getId());
+    if (optionalPlant.isPresent()) {
+      Plant actualPlant = optionalPlant.get();
+      if (!actualPlant.getImage()
+          .equalsIgnoreCase(plant.getImage())) {
+        try {
+          amazonService.deleteFile(Constants.getImageNameFromURL(actualPlant.getImage()));
+          File imageFile = createImageToUpload(plant.getImage());
+          String fileName = amazonService.uploadFile(plant.getId(), plant.getOwnerId(), imageFile);
+          plant.setImage(fileName);
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw new AmazonException("Hubo un problema al actualizar la imagen.");
+        }
+      }
+    } else {
+      //TODO: log
+      throw new PlantServerErrorException("Hubo un error interno.");
     }
   }
 }

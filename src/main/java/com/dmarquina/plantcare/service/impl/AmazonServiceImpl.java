@@ -18,7 +18,6 @@ import javax.annotation.Resource;
 
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class AmazonServiceImpl implements AmazonService {
@@ -36,28 +35,8 @@ public class AmazonServiceImpl implements AmazonService {
   }
 
   @Override
-  public String uploadFile(Long plantId, String ownerId, MultipartFile multipartFile) {
-    String fileName = "";
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
-    String dateName = dateFormat.format(new Date());
-    try {
-      File file = convertMultipartToFile(multipartFile);
-      fileName = ownerId + "-" + plantId.toString() + "-" + dateName;
-      amazonS3.putObject(
-          new PutObjectRequest(Constants.AWS_BUCKET_NAME, fileName, file).withCannedAcl(
-              CannedAccessControlList.PublicRead));
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    return fileName;
-  }
-
-  @Override
-  public String uploadFile2(Long plantId, String ownerId,  File file) {
-    String fileName = "";
-    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
-    String dateName = dateFormat.format(new Date());
-    fileName = ownerId + "-" + plantId.toString() + "-" + dateName;
+  public String uploadFile(Long plantId, String ownerId,  File file) {
+    String fileName = makeFileName(plantId,ownerId);
     amazonS3.putObject(
         new PutObjectRequest(Constants.AWS_BUCKET_NAME, fileName, file).withCannedAcl(
             CannedAccessControlList.PublicRead));
@@ -69,12 +48,12 @@ public class AmazonServiceImpl implements AmazonService {
     amazonS3.deleteObject(Constants.AWS_BUCKET_NAME, fileName);
   }
 
-  private File convertMultipartToFile(MultipartFile multipartFile) throws IOException {
-    File convertFile = new File(multipartFile.getOriginalFilename());
-    FileOutputStream fos = new FileOutputStream(convertFile);
-    fos.write(multipartFile.getBytes());
-    fos.close();
-    return convertFile;
+  private String makeFileName(Long plantId, String ownerId){
+    String fileName;
+    SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
+    String dateName = dateFormat.format(new Date());
+    fileName = ownerId + "-" + plantId.toString() + "-" + dateName;
+    return fileName;
   }
 
 }

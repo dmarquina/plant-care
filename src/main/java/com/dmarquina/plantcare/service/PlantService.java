@@ -19,7 +19,5 @@ public interface PlantService {
 
   void delete(Long id);
 
-  Plant addImagePlant(Long plantId, String ownerId, MultipartFile newImage);
-
-  int updateImagePlant(Long plantId, String ownerId, String imageURL, MultipartFile newImage);
+  List<Plant> findAllPlants();
 }

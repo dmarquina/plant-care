@@ -7,12 +7,16 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface PlantRepository extends JpaRepository<Plant, Long> {
   @Query(
       "SELECT DISTINCT p FROM Plant p JOIN FETCH p.reminders WHERE p.ownerId= :ownerId ORDER BY p.id DESC")
   List<Plant> getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(@Param("ownerId") String ownerId);
+
+  @Query(value = "SELECT p FROM Plant p WHERE p.ownerId IN :ownerIds")
+  List<Plant> getAllPlantsByOwnerIds(@Param("ownerIds") Collection<String> ownerIds);
 
   @Modifying
   @Query("UPDATE Plant p SET p.image = :image WHERE p.id = :id")
