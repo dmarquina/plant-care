@@ -6,7 +6,7 @@ import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.AmazonService;
 import com.dmarquina.plantcare.service.PlantService;
 import com.dmarquina.plantcare.service.ReminderService;
-import com.dmarquina.plantcare.util.Constants;
+import com.dmarquina.plantcare.util.AWSUtils;
 import com.dmarquina.plantcare.util.exceptionhandler.AmazonException;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantNotFoundException;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
@@ -58,7 +58,7 @@ public class PlantServiceImpl implements PlantService {
   @Transactional
   public Plant create(Plant plant) {
     validateImage(plant.getImage());
-    File imageFile = createImageToUpload(plant.getImage());
+    File imageFile = createImageFileToUpload(plant.getImage());
     plant.setImage("");
     Plant plantCreated;
     try {
@@ -127,7 +127,7 @@ public class PlantServiceImpl implements PlantService {
     }
   }
 
-  private File createImageToUpload(String imageBase64) {
+  private File createImageFileToUpload(String imageBase64) {
     byte[] decodedBytes = Base64.decodeBase64(imageBase64);
     File imageFile = new File("image");
     try {
@@ -149,8 +149,8 @@ public class PlantServiceImpl implements PlantService {
       if (!actualPlant.getImage()
           .equalsIgnoreCase(plant.getImage())) {
         try {
-          amazonService.deleteFile(Constants.getImageNameFromURL(actualPlant.getImage()));
-          File imageFile = createImageToUpload(plant.getImage());
+          amazonService.deleteFile(AWSUtils.getImageNameFromURL(actualPlant.getImage()));
+          File imageFile = createImageFileToUpload(plant.getImage());
           String fileName = amazonService.uploadFile(plant.getId(), plant.getOwnerId(), imageFile);
           plant.setImage(fileName);
         } catch (Exception e) {

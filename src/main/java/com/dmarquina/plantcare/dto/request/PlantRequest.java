@@ -1,7 +1,7 @@
 package com.dmarquina.plantcare.dto.request;
 
 import com.dmarquina.plantcare.model.Reminder;
-import com.dmarquina.plantcare.util.Constants;
+import com.dmarquina.plantcare.util.AWSUtils;
 
 import java.util.List;
 import java.util.Set;
@@ -35,6 +35,6 @@ public class PlantRequest {
   }
 
   public String getImage() {
-    return this.image != null ? Constants.getImageNameFromURL(this.image) : "";
+    return this.image != null ? AWSUtils.getImageNameFromURL(this.image) : "";
   }
 }

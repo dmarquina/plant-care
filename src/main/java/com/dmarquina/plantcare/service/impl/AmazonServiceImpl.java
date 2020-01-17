@@ -6,11 +6,9 @@ import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.dmarquina.plantcare.service.AmazonService;
-import com.dmarquina.plantcare.util.Constants;
+import com.dmarquina.plantcare.util.AWSUtils;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.annotation.PostConstruct;
@@ -35,20 +33,21 @@ public class AmazonServiceImpl implements AmazonService {
   }
 
   @Override
-  public String uploadFile(Long plantId, String ownerId,  File file) {
-    String fileName = makeFileName(plantId,ownerId);
+  public String uploadFile(Long plantId, String ownerId, File file) {
+    String fileName = makeFileName(plantId, ownerId);
+
     amazonS3.putObject(
-        new PutObjectRequest(Constants.AWS_BUCKET_NAME, fileName, file).withCannedAcl(
+        new PutObjectRequest(AWSUtils.AWS_CURRENT_PHOTOS_BUCKET, fileName, file).withCannedAcl(
             CannedAccessControlList.PublicRead));
     return fileName;
   }
 
   @Override
   public void deleteFile(String fileName) {
-    amazonS3.deleteObject(Constants.AWS_BUCKET_NAME, fileName);
+    amazonS3.deleteObject(AWSUtils.AWS_CURRENT_PHOTOS_BUCKET, fileName);
   }
 
-  private String makeFileName(Long plantId, String ownerId){
+  private String makeFileName(Long plantId, String ownerId) {
     String fileName;
     SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy-HH-mm-ss");
     String dateName = dateFormat.format(new Date());

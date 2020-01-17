@@ -2,7 +2,7 @@ package com.dmarquina.plantcare.dto.response;
 
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.model.Reminder;
-import com.dmarquina.plantcare.util.Constants;
+import com.dmarquina.plantcare.util.AWSUtils;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,7 +24,7 @@ public class PlantResponse {
     this.setReminders(plant.getReminders());
   }
 
-  public void setReminders(Set<Reminder> reminders) {
+  private void setReminders(Set<Reminder> reminders) {
     this.reminders = reminders.stream()
         .map(r -> {
           ReminderResponse rr = new ReminderResponse();
@@ -35,6 +35,6 @@ public class PlantResponse {
   }
 
   public String getImage() {
-    return Constants.getImageURL(image);
+    return AWSUtils.getImageURL(image);
   }
 }

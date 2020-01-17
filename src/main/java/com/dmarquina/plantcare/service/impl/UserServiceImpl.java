@@ -45,6 +45,7 @@ public class UserServiceImpl implements UserService {
 
   private User setKeepMaxQuantityPlantsAndDisplayName(User user) {
     try {
+      //TODO: Cambiar a un if statement con Optional
       User userFound = userRepository.findById(user.getId()).get();
       user.setMaxQuantityPlants(userFound.getMaxQuantityPlants());
       user.setDisplayName(userFound.getDisplayName());

@@ -50,7 +50,8 @@ public class PlantController {
                                  .collect(Collectors.toList()));
   }
 
-  @ApiOperation(value = "Listar plantas por usuario", notes = "Servicio para listar las plantas por usuario")
+  @ApiOperation(value = "Listar plantas por usuario",
+      notes = "Servicio para listar las plantas por usuario")
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Plantas listadas correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
@@ -62,7 +63,6 @@ public class PlantController {
                                  .map(PlantResponse::new)
                                  .collect(Collectors.toList()));
   }
-
 
   @ApiOperation(value = "Obtiene la planta  por id",
       notes = "Servicio para obtener la planta  por id")
