@@ -39,6 +39,7 @@ public class AmazonServiceImpl implements AmazonService {
     amazonS3.putObject(
         new PutObjectRequest(AWSUtils.AWS_CURRENT_PHOTOS_BUCKET, fileName, file).withCannedAcl(
             CannedAccessControlList.PublicRead));
+    file.delete();
     return fileName;
   }
 
