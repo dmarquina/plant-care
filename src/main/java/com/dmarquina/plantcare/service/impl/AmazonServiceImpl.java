@@ -37,7 +37,7 @@ public class AmazonServiceImpl implements AmazonService {
     String fileName = makeFileName(plantId, ownerId);
 
     amazonS3.putObject(
-        new PutObjectRequest(AWSUtils.AWS_CURRENT_PHOTOS_BUCKET, fileName, file).withCannedAcl(
+        new PutObjectRequest(AWSUtils.AWS_BUCKET_NAME, fileName, file).withCannedAcl(
             CannedAccessControlList.PublicRead));
     file.delete();
     return fileName;
@@ -45,7 +45,7 @@ public class AmazonServiceImpl implements AmazonService {
 
   @Override
   public void deleteFile(String fileName) {
-    amazonS3.deleteObject(AWSUtils.AWS_CURRENT_PHOTOS_BUCKET, fileName);
+    amazonS3.deleteObject(AWSUtils.AWS_BUCKET_NAME, fileName);
   }
 
   private String makeFileName(Long plantId, String ownerId) {

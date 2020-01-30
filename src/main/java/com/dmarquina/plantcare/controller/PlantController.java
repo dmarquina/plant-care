@@ -123,4 +123,5 @@ public class PlantController {
     plantService.delete(id);
     return new ResponseEntity(HttpStatus.OK);
   }
+
 }

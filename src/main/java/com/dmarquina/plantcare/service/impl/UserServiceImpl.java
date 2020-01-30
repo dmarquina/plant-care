@@ -1,6 +1,5 @@
 package com.dmarquina.plantcare.service.impl;
 
-import com.dmarquina.plantcare.config.CorsConfig;
 import com.dmarquina.plantcare.model.User;
 import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.UserService;
@@ -19,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 @Service("userService")
 public class UserServiceImpl implements UserService {
-  private final Logger log = LoggerFactory.getLogger(CorsConfig.class);
+  private final Logger log = LoggerFactory.getLogger(UserService.class);
 
   @Autowired
   private UserRepository userRepository;
@@ -49,11 +48,14 @@ public class UserServiceImpl implements UserService {
 
   private User setKeepMaxQuantityPlantsAndDisplayName(User user) {
     try {
-      User userFound = findUserById(user.getId());
-      user.setMaxQuantityPlants(userFound.getMaxQuantityPlants());
-      user.setDisplayName(userFound.getDisplayName());
-    } catch (NoSuchElementException ne) {
-      user.setMaxQuantityPlants(Constants.MAX_QUANTITY_PLANTS_DEFAULT);
+      Optional<User> userFoundOptional = userRepository.findById(user.getId());
+      if (userFoundOptional.isPresent()) {
+        User userFound = userFoundOptional.get();
+        user.setMaxQuantityPlants(userFound.getMaxQuantityPlants());
+        user.setDisplayName(userFound.getDisplayName());
+      } else {
+        user.setMaxQuantityPlants(Constants.MAX_QUANTITY_PLANTS_DEFAULT);
+      }
     } catch (Exception e) {
       throw new PlantServerErrorException(
           "Hubo un error interno al crear o actualizar el usuario.");

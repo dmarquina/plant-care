@@ -46,11 +46,9 @@ public class PlantServiceImpl implements PlantService {
   public Plant findById(Long id) {
     Optional<Plant> opPlant = plantRepository.findById(id);
     if (opPlant.isPresent()) {
-      return plantRepository.findById(id)
-          .get();
+      return opPlant.get();
     } else {
       throw new PlantNotFoundException("No se encontró la planta.");
-
     }
   }
 
@@ -68,7 +66,7 @@ public class PlantServiceImpl implements PlantService {
     }
     try {
       String fileName =
-          amazonService.uploadFile(plantCreated.getId(), plantCreated.getOwnerId(), imageFile);
+          amazonService.uploadFile(plant.getId(), plant.getOwnerId(), imageFile);
       plantCreated.setImage(fileName);
     } catch (Exception e) {
       plantRepository.deleteById(plantCreated.getId());

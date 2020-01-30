@@ -13,6 +13,7 @@ public class AWSUtils {
   Environment environment;
 
   public static String AWS_CURRENT_PHOTOS_BUCKET;
+  public static String AWS_BUCKET_NAME = "akirasgarden/current-photos-plants";
 
   @PostConstruct
   private void initialize() {
