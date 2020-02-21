@@ -19,4 +19,5 @@ public class User {
   private String displayName;
   private String photoUrl;
   private int maxQuantityPlants;
+  private int maxQuantityPlantMemories;
 }

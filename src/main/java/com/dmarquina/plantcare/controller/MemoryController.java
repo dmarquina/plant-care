@@ -1,13 +1,9 @@
 package com.dmarquina.plantcare.controller;
 
-import com.dmarquina.plantcare.dto.request.JournalRequest;
-import com.dmarquina.plantcare.dto.request.PlantRequest;
-import com.dmarquina.plantcare.dto.response.JournalResponse;
-import com.dmarquina.plantcare.dto.response.PlantResponse;
-import com.dmarquina.plantcare.model.Journal;
-import com.dmarquina.plantcare.model.Plant;
-import com.dmarquina.plantcare.service.JournalService;
-import com.dmarquina.plantcare.service.PlantService;
+import com.dmarquina.plantcare.dto.request.MemoryRequest;
+import com.dmarquina.plantcare.dto.response.MemoryResponse;
+import com.dmarquina.plantcare.model.Memory;
+import com.dmarquina.plantcare.service.MemoryService;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -30,38 +26,38 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Api(tags = "Diario")
+@Api(tags = "Recuerdos")
 @RestController
-@RequestMapping("/journals")
-public class JournalController {
+@RequestMapping("/memories")
+public class MemoryController {
 
   @Autowired
-  JournalService journalService;
+  MemoryService memoryService;
 
-  @ApiOperation(value = "Listar diario", notes = "Servicio para listar diario")
-  @ApiResponses(value = { @ApiResponse(code = 201, message = "Diario de plantas listado correctamente"),
+  @ApiOperation(value = "Listar memorias", notes = "Servicio para listar memorias")
+  @ApiResponses(value = { @ApiResponse(code = 201, message = "Memorias de plantas listado correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @GetMapping(value = "/{plantId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<List<JournalResponse>> findJournalByPlantId(@PathVariable Long plantId) {
-    return ResponseEntity.ok(journalService.findJournalByPlantId(plantId)
+  public ResponseEntity<List<MemoryResponse>> findMemoryByPlantId(@PathVariable Long plantId) {
+    return ResponseEntity.ok(memoryService.findMemoryByPlantId(plantId)
                                  .stream()
-                                 .map(JournalResponse::new)
+                                 .map(MemoryResponse::new)
                                  .collect(Collectors.toList()));
   }
 
-  @ApiOperation(value = "Crear entrada al diario ", notes = "Servicio para crear entrada al diario ")
-  @ApiResponses(value = { @ApiResponse(code = 201, message = "Entrada al diario creada correctamente"),
+  @ApiOperation(value = "Crear entrada a las memorias", notes = "Servicio para crear entrada al memoria ")
+  @ApiResponses(value = { @ApiResponse(code = 201, message = "Entrada a las memorias creada correctamente"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<JournalResponse> createJournal(@RequestBody @Valid JournalRequest journalRequest) {
-    Journal newJournal = new Journal();
-    BeanUtils.copyProperties(journalRequest, newJournal);
-    Journal plantCreated = journalService.create(newJournal);
-    JournalResponse plantResponse = new JournalResponse(plantCreated);
-    return ResponseEntity.ok(plantResponse);
+  public ResponseEntity<MemoryResponse> createMemory(@RequestBody @Valid MemoryRequest memoryRequest) {
+    Memory newMemory = new Memory();
+    BeanUtils.copyProperties(memoryRequest, newMemory);
+    Memory memoryCreated = memoryService.create(newMemory);
+    MemoryResponse memoryResponse = new MemoryResponse(memoryCreated);
+    return ResponseEntity.ok(memoryResponse);
   }
 }

@@ -6,7 +6,6 @@ import com.dmarquina.plantcare.service.UserService;
 import com.dmarquina.plantcare.util.Constants;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -27,7 +26,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public User createUpdateUser(User user) {
     try {
-      return userRepository.save(setKeepMaxQuantityPlantsAndDisplayName(user));
+      return userRepository.save(setMaxQuantityPlantsAndDisplayName(user));
     } catch (Exception e) {
       e.printStackTrace();
       throw new PlantServerErrorException(
@@ -46,17 +45,20 @@ public class UserServiceImpl implements UserService {
     }
   }
 
-  private User setKeepMaxQuantityPlantsAndDisplayName(User user) {
+  private User setMaxQuantityPlantsAndDisplayName(User user) {
     try {
       Optional<User> userFoundOptional = userRepository.findById(user.getId());
       if (userFoundOptional.isPresent()) {
         User userFound = userFoundOptional.get();
         user.setMaxQuantityPlants(userFound.getMaxQuantityPlants());
+        user.setMaxQuantityPlantMemories(userFound.getMaxQuantityPlantMemories());
         user.setDisplayName(userFound.getDisplayName());
       } else {
         user.setMaxQuantityPlants(Constants.MAX_QUANTITY_PLANTS_DEFAULT);
+        user.setMaxQuantityPlantMemories(Constants.MAX_QUANTITY_PLANT_MEMORIES_DEFAULT);
       }
     } catch (Exception e) {
+      log.info("Error con el usuario" + user.getId() + user);
       throw new PlantServerErrorException(
           "Hubo un error interno al crear o actualizar el usuario.");
     }

@@ -12,6 +12,7 @@ public class UserResponse {
   private String deviceToken;
   private String email;
   private int maxQuantityPlants;
+  private int maxQuantityPlantMemories;
   private String displayName;
   private String photoUrl;
 

@@ -13,8 +13,8 @@ import lombok.ToString;
 @Data
 @Entity
 @ToString
-@Table(name = "journal")
-public class Journal {
+@Table(name = "memory")
+public class Memory {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -8,10 +8,9 @@ import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public class JournalRequest {
+public class MemoryRequest {
 
-  @NotEmpty(message = "Es necesario el id de la planta")
-  private String plantId;
+  private long plantId;
   @NotEmpty(message = "Es necesaria una imagen")
   private String image;
   private String status;
