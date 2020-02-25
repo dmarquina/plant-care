@@ -32,19 +32,19 @@ public class AWSUtils {
     String S3_AKIRASGARDEN_PATH = environment.getProperty("aws_s3_akirasgarden_path");
     String AKIRASGARDEN_BASE_BUCKET = environment.getProperty("aws_akirasgarden_base_bukcet");
 
-    CURRENT_PHOTOS_BUCKET = AKIRASGARDEN_BASE_BUCKET + "current-photos-plants/";
-    PHOTOS_MEMORIES_BUCKET = AKIRASGARDEN_BASE_BUCKET + "photo-memories/";
+    CURRENT_PHOTOS_BUCKET = AKIRASGARDEN_BASE_BUCKET + "current-photos-plants";
+    PHOTOS_MEMORIES_BUCKET = AKIRASGARDEN_BASE_BUCKET + "photos-memories";
 
-    CURRENT_PHOTOS_BUCKET_PATH = S3_AKIRASGARDEN_PATH + CURRENT_PHOTOS_BUCKET;
-    PHOTOS_MEMORIES_BUCKET_PATH = S3_AKIRASGARDEN_PATH + PHOTOS_MEMORIES_BUCKET;
+    CURRENT_PHOTOS_BUCKET_PATH = S3_AKIRASGARDEN_PATH + CURRENT_PHOTOS_BUCKET + "/";
+    PHOTOS_MEMORIES_BUCKET_PATH = S3_AKIRASGARDEN_PATH + PHOTOS_MEMORIES_BUCKET + "/";
   }
 
-  public static String getImageURL(String fileName) {
-    return CURRENT_PHOTOS_BUCKET_PATH + fileName;
+  public static String getImageURL(String bucketPath, String fileName) {
+    return bucketPath + fileName;
   }
 
-  public static String getImageNameFromURL(String imageURL) {
-    return imageURL.replace(CURRENT_PHOTOS_BUCKET_PATH, "");
+  public static String getImageNameOnly(String bucketPath, String imageURL) {
+    return imageURL.replace(bucketPath, "");
   }
 
   public static File createImageFileToUpload(String imageBase64) {

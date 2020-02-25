@@ -6,6 +6,7 @@ import com.dmarquina.plantcare.service.UserService;
 import com.dmarquina.plantcare.util.Constants;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import org.slf4j.Logger;

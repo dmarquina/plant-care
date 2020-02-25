@@ -35,6 +35,6 @@ public class PlantRequest {
   }
 
   public String getImage() {
-    return this.image != null ? AWSUtils.getImageNameFromURL(this.image) : "";
+    return this.image != null ? AWSUtils.getImageNameOnly(AWSUtils.CURRENT_PHOTOS_BUCKET_PATH, this.image) : "";
   }
 }

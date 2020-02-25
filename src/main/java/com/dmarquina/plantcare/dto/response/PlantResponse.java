@@ -35,6 +35,6 @@ public class PlantResponse {
   }
 
   public String getImage() {
-    return AWSUtils.getImageURL(image);
+    return AWSUtils.getImageURL(AWSUtils.CURRENT_PHOTOS_BUCKET_PATH, image);
   }
 }

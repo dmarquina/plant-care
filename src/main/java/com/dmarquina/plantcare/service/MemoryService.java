@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface MemoryService {
 
-  List<Memory> findMemoryByPlantId(Long plantId);
+  List<Memory> findMemoriesByPlantId(Long plantId);
 
   Memory create(Memory memory);
 }

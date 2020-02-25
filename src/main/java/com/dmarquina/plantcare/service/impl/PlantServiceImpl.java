@@ -6,18 +6,16 @@ import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.AmazonService;
 import com.dmarquina.plantcare.service.PlantService;
 import com.dmarquina.plantcare.service.ReminderService;
-import com.dmarquina.plantcare.service.UserService;
 import com.dmarquina.plantcare.util.AWSUtils;
 import com.dmarquina.plantcare.util.exceptionhandler.AmazonException;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantNotFoundException;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
 
 import java.io.File;
-import java.io.FileOutputStream;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import org.apache.commons.codec.binary.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +61,7 @@ public class PlantServiceImpl implements PlantService {
     validateImage(plant.getImage());
     File imageFile = AWSUtils.createImageFileToUpload(plant.getImage());
     plant.setImage("");
+    plant.setCreationDate(LocalDate.now());
     Plant plantCreated;
     try {
       plantCreated = plantRepository.save(plant);
@@ -143,7 +142,8 @@ public class PlantServiceImpl implements PlantService {
           .equalsIgnoreCase(plant.getImage())) {
         try {
           amazonService.deleteFile(AWSUtils.CURRENT_PHOTOS_BUCKET,
-                                   AWSUtils.getImageNameFromURL(actualPlant.getImage()));
+                                   AWSUtils.getImageNameOnly(AWSUtils.CURRENT_PHOTOS_BUCKET_PATH,
+                                                             actualPlant.getImage()));
         } catch (Exception e) {
           e.printStackTrace();
           log.info("Hubo un problema al eliminar la imagen");

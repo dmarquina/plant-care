@@ -40,8 +40,8 @@ public class MemoryController {
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @GetMapping(value = "/{plantId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<List<MemoryResponse>> findMemoryByPlantId(@PathVariable Long plantId) {
-    return ResponseEntity.ok(memoryService.findMemoryByPlantId(plantId)
+  public ResponseEntity<List<MemoryResponse>> findMemoriesByPlantId(@PathVariable Long plantId) {
+    return ResponseEntity.ok(memoryService.findMemoriesByPlantId(plantId)
                                  .stream()
                                  .map(MemoryResponse::new)
                                  .collect(Collectors.toList()));
@@ -49,6 +49,7 @@ public class MemoryController {
 
   @ApiOperation(value = "Crear entrada a las memorias", notes = "Servicio para crear entrada al memoria ")
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Entrada a las memorias creada correctamente"),
+      @ApiResponse(code = 300, message = "No mas espacio para recuerdos"),
       @ApiResponse(code = 400, message = "Solicitud inválida"),
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
@@ -60,4 +61,5 @@ public class MemoryController {
     MemoryResponse memoryResponse = new MemoryResponse(memoryCreated);
     return ResponseEntity.ok(memoryResponse);
   }
+
 }

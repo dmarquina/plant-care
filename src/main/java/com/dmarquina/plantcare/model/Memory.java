@@ -22,6 +22,6 @@ public class Memory {
   private Long plantId;
   private String image;
   private LocalDate date;
-  private String status;
+  private Double status;
 
 }

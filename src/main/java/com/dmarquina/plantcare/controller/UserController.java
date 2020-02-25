@@ -1,7 +1,10 @@
 package com.dmarquina.plantcare.controller;
 
+import com.dmarquina.plantcare.dto.request.MemoryRequest;
 import com.dmarquina.plantcare.dto.request.UserRequest;
+import com.dmarquina.plantcare.dto.response.MemoryResponse;
 import com.dmarquina.plantcare.dto.response.UserResponse;
+import com.dmarquina.plantcare.model.Memory;
 import com.dmarquina.plantcare.model.User;
 import com.dmarquina.plantcare.service.UserService;
 

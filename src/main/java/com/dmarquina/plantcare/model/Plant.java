@@ -1,5 +1,6 @@
 package com.dmarquina.plantcare.model;
 
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -28,6 +29,7 @@ public class Plant {
   private String ownerId;
   private String name;
   private String image;
+  private LocalDate creationDate;
   @OneToMany(cascade = CascadeType.ALL)
   @JoinColumn(name = "idPlant")
   private Set<Reminder> reminders = new HashSet<>();
