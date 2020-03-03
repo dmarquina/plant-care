@@ -15,4 +15,6 @@ public interface MemoryRepository extends JpaRepository<Memory, Long> {
   @Query(
       "SELECT m FROM User u INNER JOIN Plant p ON p.ownerId = u.id RIGHT JOIN Memory m on m.plantId = p.id  WHERE u.id = :ownerId ")
   List<Memory> findByOwnerId(@Param("ownerId") String ownerId);
+
+  long deleteByPlantId(long plantId);
 }

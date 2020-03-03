@@ -1,6 +1,8 @@
 package com.dmarquina.plantcare.service.impl;
 
+import com.dmarquina.plantcare.model.Memory;
 import com.dmarquina.plantcare.model.Plant;
+import com.dmarquina.plantcare.repository.MemoryRepository;
 import com.dmarquina.plantcare.repository.PlantRepository;
 import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.AmazonService;
@@ -33,6 +35,9 @@ public class PlantServiceImpl implements PlantService {
 
   @Autowired
   private PlantRepository plantRepository;
+
+  @Autowired
+  private MemoryRepository memoryRepository;
 
   @Autowired
   AmazonService amazonService;
@@ -101,18 +106,33 @@ public class PlantServiceImpl implements PlantService {
 
   @Override
   @Transactional
-  public void delete(Long id) {
-    Optional<Plant> opPlant = plantRepository.findById(id);
+  public void delete(Long plantId) {
+    Optional<Plant> opPlant = plantRepository.findById(plantId);
     if (opPlant.isPresent()) {
       Plant plantFound = opPlant.get();
+      //Eliminar planta de la tabla plants
       try {
-        plantRepository.deleteById(id);
+        plantRepository.deleteById(plantId);
       } catch (Exception e) {
         e.printStackTrace();
         throw new PlantServerErrorException("Hubo un error interno al eliminar la planta.");
       }
+      //Eliminar recuerdos de planta de la tabla memories
       try {
+        memoryRepository.deleteByPlantId(plantId);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new PlantServerErrorException(
+            "Hubo un error interno al eliminar los recuerdos de planta.");
+      }
+      try {
+        //Eliminar foto de la planta en aws
         amazonService.deleteFile(AWSUtils.CURRENT_PHOTOS_BUCKET, plantFound.getImage());
+        //Eliminar foto de los recuedos de la planta en aws
+        List<Memory> memories = memoryRepository.findByPlantIdOrderByIdDesc(plantId);
+        memories.forEach(
+            memory -> amazonService.deleteFile(AWSUtils.PHOTOS_MEMORIES_BUCKET, memory.getImage()));
+
       } catch (Exception e) {
         e.printStackTrace();
         throw new AmazonException("Hubo un problema al eliminar la imagen.");

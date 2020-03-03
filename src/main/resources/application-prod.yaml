@@ -13,5 +13,5 @@ spring:
 
 aws_access_key: ${AWS_ACCESS_KEY}
 aws_secret_key: ${AWS_SECRET_ACCESS_KEY}
-aws_s3_akirasgarden_path: https://s3.us-west-2.amazonaws.com/
-aws_akirasgarden_base_bukcet: akirasgarden/
+aws_s3_akirasgarden_path: https://s3.us-east-1.amazonaws.com/
+aws_akirasgarden_base_bukcet: akirasgarden.plants/

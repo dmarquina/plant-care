@@ -100,7 +100,7 @@
                                     </inline>
                                 </assembly>
                                 <tags>
-                                    <tag>latest</tag>
+                                    <tag>1.0.0</tag>
                                 </tags>
                                 <ports>
                                     <port>8080</port>
