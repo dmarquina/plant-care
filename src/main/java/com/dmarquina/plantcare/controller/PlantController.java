@@ -50,20 +50,6 @@ public class PlantController {
                                  .collect(Collectors.toList()));
   }
 
-  @ApiOperation(value = "Listar plantas por usuario",
-      notes = "Servicio para listar las plantas por usuario")
-  @ApiResponses(value = { @ApiResponse(code = 201, message = "Plantas listadas correctamente"),
-      @ApiResponse(code = 400, message = "Solicitud inválida"),
-      @ApiResponse(code = 500, message = "Error en el servidor") })
-  @GetMapping(value = "/users/{ownerId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
-      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<List<PlantResponse>> findAllPlantsByUser(@PathVariable String ownerId) {
-    return ResponseEntity.ok(plantService.findAllMyPlants(ownerId)
-                                 .stream()
-                                 .map(PlantResponse::new)
-                                 .collect(Collectors.toList()));
-  }
-
   @ApiOperation(value = "Obtiene la planta  por id",
       notes = "Servicio para obtener la planta  por id")
   @ApiResponses(value = { @ApiResponse(code = 201, message = "Planta  obtenida correctamente"),

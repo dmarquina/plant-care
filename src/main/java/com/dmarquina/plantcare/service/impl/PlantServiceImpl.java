@@ -46,11 +46,6 @@ public class PlantServiceImpl implements PlantService {
   ReminderService reminderService;
 
   @Override
-  public List<Plant> findAllMyPlants(String ownerId) {
-    return plantRepository.getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(ownerId);
-  }
-
-  @Override
   public Plant findById(Long id) {
     Optional<Plant> opPlant = plantRepository.findById(id);
     if (opPlant.isPresent()) {
@@ -110,6 +105,7 @@ public class PlantServiceImpl implements PlantService {
     Optional<Plant> opPlant = plantRepository.findById(plantId);
     if (opPlant.isPresent()) {
       Plant plantFound = opPlant.get();
+
       //Eliminar planta de la tabla plants
       try {
         plantRepository.deleteById(plantId);
@@ -117,6 +113,7 @@ public class PlantServiceImpl implements PlantService {
         e.printStackTrace();
         throw new PlantServerErrorException("Hubo un error interno al eliminar la planta.");
       }
+
       //Eliminar recuerdos de planta de la tabla memories
       try {
         memoryRepository.deleteByPlantId(plantId);
@@ -125,9 +122,12 @@ public class PlantServiceImpl implements PlantService {
         throw new PlantServerErrorException(
             "Hubo un error interno al eliminar los recuerdos de planta.");
       }
+
       try {
+
         //Eliminar foto de la planta en aws
         amazonService.deleteFile(AWSUtils.CURRENT_PHOTOS_BUCKET, plantFound.getImage());
+
         //Eliminar foto de los recuedos de la planta en aws
         List<Memory> memories = memoryRepository.findByPlantIdOrderByIdDesc(plantId);
         memories.forEach(
@@ -158,6 +158,7 @@ public class PlantServiceImpl implements PlantService {
     Optional<Plant> optionalPlant = plantRepository.findById(plant.getId());
     if (optionalPlant.isPresent()) {
       Plant actualPlant = optionalPlant.get();
+      if(1>=0)
       if (!actualPlant.getImage()
           .equalsIgnoreCase(plant.getImage())) {
         try {

@@ -28,10 +28,10 @@ public class AmazonServiceImpl implements AmazonService {
   private AmazonS3 amazonS3;
 
   @PostConstruct
-  private void initializeAmazon() {
-    this.amazonS3 = new AmazonS3Client(
-        new BasicAWSCredentials(environment.getProperty("aws_access_key"),
-                                environment.getProperty("aws_secret_key")));
+    private void initializeAmazon() {
+      this.amazonS3 = new AmazonS3Client(
+          new BasicAWSCredentials(environment.getProperty("aws_access_key"),
+                                  environment.getProperty("aws_secret_key")));
   }
 
   @Override

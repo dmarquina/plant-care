@@ -3,6 +3,7 @@ package com.dmarquina.plantcare.controller;
 import com.dmarquina.plantcare.dto.request.MemoryRequest;
 import com.dmarquina.plantcare.dto.request.UserRequest;
 import com.dmarquina.plantcare.dto.response.MemoryResponse;
+import com.dmarquina.plantcare.dto.response.PlantResponse;
 import com.dmarquina.plantcare.dto.response.UserResponse;
 import com.dmarquina.plantcare.model.Memory;
 import com.dmarquina.plantcare.model.User;
@@ -13,6 +14,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import javax.validation.Valid;
 
 import org.springframework.beans.BeanUtils;
@@ -58,6 +61,21 @@ public class UserController {
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<UserResponse> getUser(@PathVariable String id) {
     return ResponseEntity.ok(new UserResponse(userService.getUser(id)));
+  }
+
+
+  @ApiOperation(value = "Listar plantas por usuario",
+      notes = "Servicio para listar las plantas por usuario")
+  @ApiResponses(value = { @ApiResponse(code = 201, message = "Plantas listadas correctamente"),
+      @ApiResponse(code = 400, message = "Solicitud inválida"),
+      @ApiResponse(code = 500, message = "Error en el servidor") })
+  @GetMapping(value = "/{id}/plants", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<List<PlantResponse>> findAllPlantsByUser(@PathVariable String id) {
+    return ResponseEntity.ok(userService.findAllMyPlants(id)
+                                 .stream()
+                                 .map(PlantResponse::new)
+                                 .collect(Collectors.toList()));
   }
 
 }

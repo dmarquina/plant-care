@@ -1,5 +1,6 @@
 package com.dmarquina.plantcare.service.impl;
 
+import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.model.User;
 import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.UserService;
@@ -7,6 +8,7 @@ import com.dmarquina.plantcare.util.Constants;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import org.slf4j.Logger;
@@ -44,6 +46,11 @@ public class UserServiceImpl implements UserService {
       e.printStackTrace();
       throw new PlantServerErrorException("Hubo un error interno al obtener el usuario.");
     }
+  }
+
+  @Override
+  public List<Plant> findAllMyPlants(String ownerId) {
+    return userRepository.getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(ownerId);
   }
 
   private User setMaxQuantityPlantsAndDisplayName(User user) {

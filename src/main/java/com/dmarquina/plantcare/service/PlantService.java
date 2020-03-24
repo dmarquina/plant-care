@@ -9,8 +9,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface PlantService {
 
-  List<Plant> findAllMyPlants(String ownerId);
-
   Plant findById(Long id);
 
   Plant create(Plant plant);
