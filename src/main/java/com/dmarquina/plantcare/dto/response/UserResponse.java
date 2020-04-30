@@ -11,6 +11,7 @@ public class UserResponse {
   private String id;
   private String deviceToken;
   private String email;
+  private Boolean isEmailVerified;
   private int maxQuantityPlants;
   private int maxQuantityPlantMemories;
   private String displayName;

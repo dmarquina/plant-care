@@ -1,13 +1,17 @@
 package com.dmarquina.plantcare.service.impl;
 
+import com.dmarquina.plantcare.dto.request.UserEmailLoginRequest;
+import com.dmarquina.plantcare.dto.request.UserVerificationCodeRequest;
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.model.User;
 import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.UserService;
 import com.dmarquina.plantcare.util.Constants;
-import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
+import com.dmarquina.plantcare.util.Messages;
+import com.dmarquina.plantcare.util.UserEmailVerification;
+import com.dmarquina.plantcare.util.exceptionhandler.ResourceNotFoundException;
+import com.dmarquina.plantcare.util.exceptionhandler.PlantCareServerErrorException;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,18 +27,96 @@ public class UserServiceImpl implements UserService {
   private final Logger log = LoggerFactory.getLogger(UserService.class);
 
   @Autowired
+  private UserEmailVerification userEmailVerification;
+
+  @Autowired
   private UserRepository userRepository;
 
   @Override
   @Transactional
-  public User createUpdateUser(User user) {
+  public User emailSignUp(User user) {
     try {
-      return userRepository.save(setMaxQuantityPlantsAndDisplayName(user));
+      user.setMaxQuantityPlants(Constants.MAX_QUANTITY_PLANTS_DEFAULT);
+      user.setMaxQuantityPlantMemories(Constants.MAX_QUANTITY_PLANT_MEMORIES_DEFAULT);
+      user.setIsEmailVerified(Constants.EMAIL_VERIFIED_FALSE);
+      user.setVerificationCode(userEmailVerification.generateVerificationCode());
+      userEmailVerification.sendVerificationCodeMail(user);
+      return userRepository.save(user);
     } catch (Exception e) {
       e.printStackTrace();
-      throw new PlantServerErrorException(
-          "Hubo un error interno al crear o actualizar el usuario.");
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
+  }
+
+  @Override
+  @Transactional
+  public User resendVerificationCode(String id) {
+    try {
+      User user = findUserById(id);
+      user.setVerificationCode(userEmailVerification.generateVerificationCode());
+      userEmailVerification.sendVerificationCodeMail(user);
+      return userRepository.save(user);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
+    }
+  }
+
+  @Override
+  @Transactional
+  public User facebookAuthentication(User userRequest) {
+    try {
+      Optional<User> userFoundOptional = userRepository.findById(userRequest.getId());
+      return userFoundOptional.map(user -> facebookLogin(user, userRequest))
+          .orElseGet(() -> facebookSignUp(userRequest));
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
+    }
+  }
+
+  private User facebookLogin(User userFound, User userRequest) {
+    if (userRequest.getDeviceToken() != null && !userRequest.getDeviceToken()
+        .equals(userFound.getDeviceToken())) {
+      userFound.setDeviceToken(userRequest.getDeviceToken());
+      try {
+        userRepository.save(userFound);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw e;
+      }
+    }
+    return userFound;
+  }
+
+  private User facebookSignUp(User userRequest) {
+    userRequest.setMaxQuantityPlants(Constants.MAX_QUANTITY_PLANTS_DEFAULT);
+    userRequest.setMaxQuantityPlantMemories(Constants.MAX_QUANTITY_PLANT_MEMORIES_DEFAULT);
+    userRequest.setIsEmailVerified(Constants.EMAIL_VERIFIED_TRUE);
+    userRequest.setVerificationCode(Constants.DEFAULT_VERIFICATION_CODE);
+    try {
+      return userRepository.save(userRequest);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw e;
+    }
+  }
+
+  @Override
+  @Transactional
+  public User emailLogin(UserEmailLoginRequest userEmailLoginRequest) {
+    User userFound = findUserById(userEmailLoginRequest.getId());
+    if (userEmailLoginRequest.getDeviceToken() != null && !userEmailLoginRequest.getDeviceToken()
+        .equals(userFound.getDeviceToken())) {
+      userFound.setDeviceToken(userEmailLoginRequest.getDeviceToken());
+      try {
+        userRepository.save(userFound);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw e;
+      }
+    }
+    return userFound;
   }
 
   @Override
@@ -44,7 +126,7 @@ public class UserServiceImpl implements UserService {
       return findUserById(id);
     } catch (Exception e) {
       e.printStackTrace();
-      throw new PlantServerErrorException("Hubo un error interno al obtener el usuario.");
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }
 
@@ -53,33 +135,66 @@ public class UserServiceImpl implements UserService {
     return userRepository.getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(ownerId);
   }
 
-  private User setMaxQuantityPlantsAndDisplayName(User user) {
-    try {
-      Optional<User> userFoundOptional = userRepository.findById(user.getId());
-      if (userFoundOptional.isPresent()) {
-        User userFound = userFoundOptional.get();
-        user.setMaxQuantityPlants(userFound.getMaxQuantityPlants());
-        user.setMaxQuantityPlantMemories(userFound.getMaxQuantityPlantMemories());
-        user.setDisplayName(userFound.getDisplayName());
+  @Override
+  @Transactional
+  public User verifySignUpCode(UserVerificationCodeRequest userVerificationCodeRequest) {
+    Optional<User> userOptional = userRepository.findById(userVerificationCodeRequest.getId());
+    if (userOptional.isPresent()) {
+      User userFound = userOptional.get();
+      if (userFound.getVerificationCode()
+          .equals(userVerificationCodeRequest.getVerificationCode())) {
+        userFound.setIsEmailVerified(true);
+        try {
+          return userRepository.save(userFound);
+        } catch (Exception e) {
+          e.printStackTrace();
+          throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
+        }
       } else {
-        user.setMaxQuantityPlants(Constants.MAX_QUANTITY_PLANTS_DEFAULT);
-        user.setMaxQuantityPlantMemories(Constants.MAX_QUANTITY_PLANT_MEMORIES_DEFAULT);
+        throw new ResourceNotFoundException("Código de verificación incorrecto");
       }
-    } catch (Exception e) {
-      log.info("Error con el usuario" + user.getId() + user);
-      throw new PlantServerErrorException(
-          "Hubo un error interno al crear o actualizar el usuario.");
+    } else {
+      throw new ResourceNotFoundException(Messages.USER_NOT_FOUND_EXCEPTION_MESSAGE);
     }
-    return user;
+  }
+
+  @Override
+  public Boolean verifyPrivilege(String id, String action) {
+    Optional<User> userOptional = userRepository.findById(id);
+    if (userOptional.isPresent()) {
+      Boolean hasPrivilege;
+      User userFound = userOptional.get();
+      switch (action) {
+        case Constants.CREATE_NEW_PLANT_ACTION:
+          hasPrivilege = userRepository.getPlantsQuantity(id) < userFound.getMaxQuantityPlants();
+          break;
+        case Constants.CREATE_NEW_MEMORY_ACTION:
+          hasPrivilege =
+              userRepository.getMemoriesQuantity(id) < userFound.getMaxQuantityPlantMemories();
+          break;
+        default:
+          log.info("verifyPrivilege() - No existe la acción solicitada: " + action);
+          throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
+      }
+      return hasPrivilege;
+    } else {
+      throw new ResourceNotFoundException(Messages.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+    }
   }
 
   private User findUserById(String id) {
-    Optional<User> userFoundOptional = userRepository.findById(id);
-    if (userFoundOptional.isPresent()) {
-      return userFoundOptional.get();
-    } else {
-      log.info("Error en user ID: " + id);
-      throw new PlantServerErrorException("Hubo un error interno al obtener el usuario.");
+    try {
+      Optional<User> userFoundOptional = userRepository.findById(id);
+      if (userFoundOptional.isPresent()) {
+        return userFoundOptional.get();
+      } else {
+        log.info("Error en user ID: " + id);
+        throw new ResourceNotFoundException(Messages.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }
+
 }

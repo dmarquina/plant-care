@@ -28,20 +28,25 @@ public class AmazonServiceImpl implements AmazonService {
   private AmazonS3 amazonS3;
 
   @PostConstruct
-    private void initializeAmazon() {
-      this.amazonS3 = new AmazonS3Client(
-          new BasicAWSCredentials(environment.getProperty("aws_access_key"),
-                                  environment.getProperty("aws_secret_key")));
+  private void initializeAmazon() {
+    this.amazonS3 = new AmazonS3Client(
+        new BasicAWSCredentials(environment.getProperty("aws_access_key"),
+                                environment.getProperty("aws_secret_key")));
   }
 
   @Override
   public String uploadFile(String bucketName, String fileName, File file) {
     log.info("Llamando al servicio AWS S3");
-    amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file).withCannedAcl(
-        CannedAccessControlList.PublicRead));
-    log.info("Terminando llamado al servicio AWS S3");
-    file.delete();
-    return fileName;
+    try {
+      amazonS3.putObject(new PutObjectRequest(bucketName, fileName, file).withCannedAcl(
+          CannedAccessControlList.PublicRead));
+      log.info("Terminando llamado al servicio AWS S3");
+      file.delete();
+      return fileName;
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw e;
+    }
   }
 
   @Override

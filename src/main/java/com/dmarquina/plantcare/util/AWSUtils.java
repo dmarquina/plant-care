@@ -1,13 +1,12 @@
 package com.dmarquina.plantcare.util;
 
-import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
+import com.dmarquina.plantcare.util.exceptionhandler.PlantCareServerErrorException;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
+import java.time.LocalDateTime;
 import java.util.Date;
-import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
@@ -49,7 +48,8 @@ public class AWSUtils {
 
   public static File createImageFileToUpload(String imageBase64) {
     byte[] decodedBytes = Base64.decodeBase64(imageBase64);
-    File imageFile = new File("image");
+    File imageFile = new File(LocalDateTime.now()
+                                  .toString());
     try {
       FileOutputStream fos = new FileOutputStream(imageFile);
       fos.write(decodedBytes);
@@ -57,7 +57,7 @@ public class AWSUtils {
       return imageFile;
     } catch (Exception e) {
       e.printStackTrace();
-      throw new PlantServerErrorException("Error con la imagen de la planta.");
+      throw new PlantCareServerErrorException("Error con la imagen de la planta.");
     }
   }
 

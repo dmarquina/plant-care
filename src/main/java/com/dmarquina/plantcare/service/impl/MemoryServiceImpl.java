@@ -1,14 +1,12 @@
 package com.dmarquina.plantcare.service.impl;
 
 import com.dmarquina.plantcare.model.Memory;
-import com.dmarquina.plantcare.model.User;
 import com.dmarquina.plantcare.repository.MemoryRepository;
-import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.AmazonService;
 import com.dmarquina.plantcare.service.MemoryService;
 import com.dmarquina.plantcare.util.AWSUtils;
-import com.dmarquina.plantcare.util.exceptionhandler.MemoryNotEnoughSpaceException;
-import com.dmarquina.plantcare.util.exceptionhandler.PlantServerErrorException;
+import com.dmarquina.plantcare.util.Messages;
+import com.dmarquina.plantcare.util.exceptionhandler.PlantCareServerErrorException;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -32,9 +30,6 @@ public class MemoryServiceImpl implements MemoryService {
   @Autowired
   private MemoryRepository memoryRepository;
 
-  @Autowired
-  private UserRepository userRepository;
-
   @Override
   public List<Memory> findMemoriesByPlantId(Long plantId) {
     try {
@@ -42,33 +37,31 @@ public class MemoryServiceImpl implements MemoryService {
       return memoryRepository.findByPlantIdOrderByIdDesc(plantId);
     } catch (Exception e) {
       e.printStackTrace();
-      throw e;
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }
 
   @Override
   @Transactional
   public Memory create(Memory memory) {
-    if(!userHaveEnoughSpaceForMemories(memory)){
-      throw new MemoryNotEnoughSpaceException("Obten más espacio para tus recuerdos");
-    }
     try {
       File imageFile = AWSUtils.createImageFileToUpload(memory.getImage());
-      String fileName = AWSUtils.makeFileName(memory.getPlantId().toString());
-      amazonService.uploadFile(AWSUtils.PHOTOS_MEMORIES_BUCKET, fileName, imageFile);
-      memory.setImage(fileName);
+      String fileName = AWSUtils.makeFileName(memory.getPlantId()
+                                                  .toString());
+      memory.setImage("");
       memory.setDate(LocalDate.now());
-      return memoryRepository.save(memory);
+      memoryRepository.save(memory);
+      return uploadMemoryImage(memory, fileName, imageFile);
     } catch (Exception e) {
       log.info("memory: " + memory);
       e.printStackTrace();
-      throw new PlantServerErrorException("Hubo un error interno al subir la imagen del recuerdo");
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }
 
-  private boolean userHaveEnoughSpaceForMemories(Memory memory){
-    User user = userRepository.getUserByPlantId(memory.getPlantId());
-    List<Memory> usersMemories = memoryRepository.findByOwnerId(user.getId());
-    return user.getMaxQuantityPlantMemories() > usersMemories.size() ;
+  private synchronized Memory uploadMemoryImage(Memory memory, String fileName, File imageFile) {
+    amazonService.uploadFile(AWSUtils.PHOTOS_MEMORIES_BUCKET, fileName, imageFile);
+    memory.setImage(fileName);
+    return memoryRepository.save(memory);
   }
 }

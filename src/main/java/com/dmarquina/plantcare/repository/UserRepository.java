@@ -17,4 +17,11 @@ public interface UserRepository extends JpaRepository<User, String> {
 
   @Query("SELECT u FROM User u INNER JOIN Plant p ON p.ownerId = u.id WHERE p.id = :plantId")
   User getUserByPlantId(@Param("plantId") long plantId);
+
+  @Query("SELECT COUNT(p) FROM Plant p WHERE p.ownerId = :ownerId")
+  Integer getPlantsQuantity(@Param("ownerId") String ownerId);
+
+  @Query(
+      "SELECT COUNT(m.id) FROM User u INNER JOIN Plant p ON p.ownerId = u.id RIGHT JOIN Memory m on m.plantId = p.id  WHERE u.id = :ownerId ")
+  Integer getMemoriesQuantity(@Param("ownerId") String ownerId);
 }
