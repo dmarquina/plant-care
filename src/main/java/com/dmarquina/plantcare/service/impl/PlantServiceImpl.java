@@ -8,6 +8,7 @@ import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.AmazonService;
 import com.dmarquina.plantcare.service.PlantService;
 import com.dmarquina.plantcare.service.ReminderService;
+
 import com.dmarquina.plantcare.util.AWSUtils;
 import com.dmarquina.plantcare.util.Messages;
 import com.dmarquina.plantcare.util.exceptionhandler.AmazonException;
@@ -170,15 +171,16 @@ public class PlantServiceImpl implements PlantService {
           log.info("updatePlantImage(Plant plant) - Hubo un problema al eliminar la imagen");
           throw new AmazonException(Messages.UPLOAD_IMAGE_EXCEPTION_MESSAGE);
         }
+        File imageFile = AWSUtils.createImageFileToUpload(plant.getImage());
+        String fileName = AWSUtils.makeFileName(plant.getOwnerId(), plant.getId()
+            .toString());
         try {
-          File imageFile = AWSUtils.createImageFileToUpload(plant.getImage());
-          String fileName = AWSUtils.makeFileName(plant.getOwnerId(), plant.getId()
-              .toString());
           amazonService.uploadFile(AWSUtils.CURRENT_PHOTOS_BUCKET, fileName, imageFile);
           plant.setImage(fileName);
         } catch (Exception e) {
           e.printStackTrace();
           log.error("Hubo un problema al subir la imagen");
+          imageFile.delete();
           throw new AmazonException(Messages.UPLOAD_IMAGE_EXCEPTION_MESSAGE);
         }
       }

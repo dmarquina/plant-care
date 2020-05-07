@@ -31,6 +31,25 @@ public class MemoryServiceImpl implements MemoryService {
   private MemoryRepository memoryRepository;
 
   @Override
+  @Transactional
+  public Memory create(Memory memory) {
+      File imageFile = AWSUtils.createImageFileToUpload(memory.getImage());
+      String fileName = AWSUtils.makeFileName(memory.getPlantId()
+                                                  .toString());
+    try {
+      memory.setImage("");
+      memory.setDate(LocalDate.now());
+      memoryRepository.saveAndFlush(memory);
+      return uploadMemoryImage(memory, fileName, imageFile);
+    } catch (Exception e) {
+      log.info("memory: " + memory);
+      imageFile.delete();
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
+    }
+
+  }
+
+  @Override
   public List<Memory> findMemoriesByPlantId(Long plantId) {
     try {
       log.info("memory for plantId: " + plantId);
@@ -41,27 +60,18 @@ public class MemoryServiceImpl implements MemoryService {
     }
   }
 
-  @Override
   @Transactional
-  public Memory create(Memory memory) {
+  private synchronized Memory uploadMemoryImage(Memory memory, String fileName, File imageFile) {
     try {
-      File imageFile = AWSUtils.createImageFileToUpload(memory.getImage());
-      String fileName = AWSUtils.makeFileName(memory.getPlantId()
-                                                  .toString());
-      memory.setImage("");
-      memory.setDate(LocalDate.now());
-      memoryRepository.save(memory);
-      return uploadMemoryImage(memory, fileName, imageFile);
+      amazonService.uploadFile(AWSUtils.PHOTOS_MEMORIES_BUCKET, fileName, imageFile);
+      memory.setImage(fileName);
+      return memoryRepository.save(memory);
     } catch (Exception e) {
+      imageFile.delete();
       log.info("memory: " + memory);
-      e.printStackTrace();
+      memoryRepository.deleteById(memory.getId());
+      memoryRepository.flush();
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
-  }
-
-  private synchronized Memory uploadMemoryImage(Memory memory, String fileName, File imageFile) {
-    amazonService.uploadFile(AWSUtils.PHOTOS_MEMORIES_BUCKET, fileName, imageFile);
-    memory.setImage(fileName);
-    return memoryRepository.save(memory);
   }
 }

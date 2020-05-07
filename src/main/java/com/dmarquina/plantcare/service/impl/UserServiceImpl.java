@@ -132,7 +132,11 @@ public class UserServiceImpl implements UserService {
 
   @Override
   public List<Plant> findAllMyPlants(String ownerId) {
-    return userRepository.getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(ownerId);
+    try {
+      return userRepository.getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(ownerId);
+    }catch (Exception e){
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
+    }
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.dmarquina.plantcare.controller;
 import com.dmarquina.plantcare.dto.request.UserEmailLoginRequest;
 import com.dmarquina.plantcare.dto.request.UserRequest;
 import com.dmarquina.plantcare.dto.request.UserVerificationCodeRequest;
+import com.dmarquina.plantcare.dto.response.GardenPlantResponse;
 import com.dmarquina.plantcare.dto.response.PlantResponse;
 import com.dmarquina.plantcare.dto.response.UserResponse;
 import com.dmarquina.plantcare.dto.response.VerifyPrivilegeResponse;
@@ -126,11 +127,8 @@ public class UserController {
       @ApiResponse(code = 500, message = "Error en el servidor") })
   @GetMapping(value = "/{id}/plants", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<List<PlantResponse>> findAllPlantsByUser(@PathVariable String id) {
-    return ResponseEntity.ok(userService.findAllMyPlants(id)
-                                 .stream()
-                                 .map(PlantResponse::new)
-                                 .collect(Collectors.toList()));
+  public ResponseEntity<GardenPlantResponse> findAllGardenPlantsByUser(@PathVariable String id) {
+    return ResponseEntity.ok(new GardenPlantResponse(userService.findAllMyPlants(id)));
   }
 
   @ApiOperation(value = "Verificar si el ususario puede realizar determinada acción",
