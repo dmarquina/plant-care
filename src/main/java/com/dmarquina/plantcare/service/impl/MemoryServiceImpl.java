@@ -33,20 +33,25 @@ public class MemoryServiceImpl implements MemoryService {
   @Override
   @Transactional
   public Memory create(Memory memory) {
-      File imageFile = AWSUtils.createImageFileToUpload(memory.getImage());
-      String fileName = AWSUtils.makeFileName(memory.getPlantId()
-                                                  .toString());
+    validateImage(memory.getImage());
+    File imageFile = AWSUtils.createImageFileToUpload(memory.getImage());
+    memory.setImage("");
+    memory.setDate(LocalDate.now());
+    Memory memoryCreated;
     try {
-      memory.setImage("");
-      memory.setDate(LocalDate.now());
-      memoryRepository.saveAndFlush(memory);
-      return uploadMemoryImage(memory, fileName, imageFile);
+      memoryCreated = memoryRepository.saveAndFlush(memory);
     } catch (Exception e) {
+      log.info("create(Memory memory) - Hubo un problema al crear el recuerdo");
       log.info("memory: " + memory);
-      imageFile.delete();
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
-
+    uploadMemoryImage(memory, memoryCreated, imageFile);
+    try {
+      return memoryRepository.save(memoryCreated);
+    } catch (Exception e) {
+      log.info("create(Memory memory) - Hubo un problema al crear el recuerdo con foto");
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
+    }
   }
 
   @Override
@@ -61,17 +66,29 @@ public class MemoryServiceImpl implements MemoryService {
   }
 
   @Transactional
-  private synchronized Memory uploadMemoryImage(Memory memory, String fileName, File imageFile) {
+  private synchronized void uploadMemoryImage(Memory memory, Memory memoryCreated, File imageFile) {
     try {
+      String fileName = AWSUtils.makeFileName(memory.getPlantId()
+                                                  .toString(), memoryCreated.getId()
+                                                  .toString());
       amazonService.uploadFile(AWSUtils.PHOTOS_MEMORIES_BUCKET, fileName, imageFile);
-      memory.setImage(fileName);
-      return memoryRepository.save(memory);
+      memoryCreated.setImage(fileName);
     } catch (Exception e) {
       imageFile.delete();
+      log.info(
+          "uploadMemoryImage(Memory memory, Memory memoryCreated,File imageFile) - Hubo un problema al guardar la foto del recuerdo");
       log.info("memory: " + memory);
-      memoryRepository.deleteById(memory.getId());
+      memoryRepository.deleteById(memoryCreated.getId());
       memoryRepository.flush();
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
+    }
+  }
+
+  private void validateImage(String imageFile) {
+    if (imageFile == null || imageFile.equalsIgnoreCase("")) {
+      log.info(
+          "validateImage(String imageFile) - Hubo un problema con la imagen, parece estar vacia");
+      throw new PlantCareServerErrorException("Es necesaria la imagen de tu planta");
     }
   }
 }

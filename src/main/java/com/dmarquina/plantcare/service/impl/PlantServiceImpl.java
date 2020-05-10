@@ -59,34 +59,42 @@ public class PlantServiceImpl implements PlantService {
 
   @Override
   @Transactional
-  public synchronized Plant create(Plant plant) {
+  public Plant create(Plant plant) {
     validateImage(plant.getImage());
     File imageFile = AWSUtils.createImageFileToUpload(plant.getImage());
     plant.setImage("");
     plant.setCreationDate(LocalDate.now());
     Plant plantCreated;
     try {
-      plantCreated = plantRepository.save(plant);
+      plantCreated = plantRepository.saveAndFlush(plant);
     } catch (Exception e) {
+      log.info("create(Plant plant) - Hubo un problema al crear la planta");
+      log.info("plant: " + plant);
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
     uploadNewPlantImage(plant, plantCreated, imageFile);
     try {
       return plantRepository.save(plantCreated);
     } catch (Exception e) {
-      //TODO: eliminar foto porseacaso
+      log.info("create(Plant plant) - Hubo un problema al crear la planta con foto");
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }
 
-  private void uploadNewPlantImage(Plant plant, Plant plantCreated, File imageFile) {
+  @Transactional
+  private synchronized void uploadNewPlantImage(Plant plant, Plant plantCreated, File imageFile) {
     try {
       String fileName = AWSUtils.makeFileName(plant.getOwnerId(), (plantCreated.getId()
           .toString()));
       amazonService.uploadFile(AWSUtils.CURRENT_PHOTOS_BUCKET, fileName, imageFile);
       plantCreated.setImage(fileName);
     } catch (Exception e) {
+      imageFile.delete();
+      log.info(
+          "uploadNewPlantImage(Plant plant, Plant plantCreated, File imageFile) - Hubo un problema al guardar la foto de la nueva planta");
+      log.info("plant: " + plant);
       plantRepository.deleteById(plantCreated.getId());
+      plantRepository.flush();
       e.printStackTrace();
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
@@ -129,7 +137,7 @@ public class PlantServiceImpl implements PlantService {
         //Eliminar foto de la planta en aws
         amazonService.deleteFile(AWSUtils.CURRENT_PHOTOS_BUCKET, plantFound.getImage());
 
-        //Eliminar foto de los recuedos de la planta en aws
+        //Eliminar fotos de los recuedos de la planta en aws
         List<Memory> memories = memoryRepository.findByPlantIdOrderByIdDesc(plantId);
         memories.forEach(
             memory -> amazonService.deleteFile(AWSUtils.PHOTOS_MEMORIES_BUCKET, memory.getImage()));
@@ -149,9 +157,10 @@ public class PlantServiceImpl implements PlantService {
   }
 
   private void validateImage(String imageFile) {
-    //TODO: Quitar o revalidar esta vaina
     if (imageFile == null || imageFile.equalsIgnoreCase("")) {
-      throw new PlantCareServerErrorException("Es necesaria la imagen de tu plantita");
+      log.info(
+          "validateImage(String imageFile) - Hubo un problema con la imagen, parece estar vacia");
+      throw new PlantCareServerErrorException("Es necesaria la imagen de tu planta");
     }
   }
 

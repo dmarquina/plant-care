@@ -12,6 +12,7 @@ import com.dmarquina.plantcare.util.UserEmailVerification;
 import com.dmarquina.plantcare.util.exceptionhandler.ResourceNotFoundException;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantCareServerErrorException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,12 +80,13 @@ public class UserServiceImpl implements UserService {
     if (userRequest.getDeviceToken() != null && !userRequest.getDeviceToken()
         .equals(userFound.getDeviceToken())) {
       userFound.setDeviceToken(userRequest.getDeviceToken());
-      try {
-        userRepository.save(userFound);
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw e;
-      }
+    }
+    userFound.setLastLoginDate(LocalDate.now());
+    try {
+      userRepository.save(userFound);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw e;
     }
     return userFound;
   }
@@ -94,6 +96,7 @@ public class UserServiceImpl implements UserService {
     userRequest.setMaxQuantityPlantMemories(Constants.MAX_QUANTITY_PLANT_MEMORIES_DEFAULT);
     userRequest.setIsEmailVerified(Constants.EMAIL_VERIFIED_TRUE);
     userRequest.setVerificationCode(Constants.DEFAULT_VERIFICATION_CODE);
+    userRequest.setLastLoginDate(LocalDate.now());
     try {
       return userRepository.save(userRequest);
     } catch (Exception e) {
@@ -109,12 +112,13 @@ public class UserServiceImpl implements UserService {
     if (userEmailLoginRequest.getDeviceToken() != null && !userEmailLoginRequest.getDeviceToken()
         .equals(userFound.getDeviceToken())) {
       userFound.setDeviceToken(userEmailLoginRequest.getDeviceToken());
-      try {
-        userRepository.save(userFound);
-      } catch (Exception e) {
-        e.printStackTrace();
-        throw e;
-      }
+    }
+    userFound.setLastLoginDate(LocalDate.now());
+    try {
+      userRepository.save(userFound);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw e;
     }
     return userFound;
   }
@@ -134,7 +138,7 @@ public class UserServiceImpl implements UserService {
   public List<Plant> findAllMyPlants(String ownerId) {
     try {
       return userRepository.getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(ownerId);
-    }catch (Exception e){
+    } catch (Exception e) {
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }
@@ -148,6 +152,7 @@ public class UserServiceImpl implements UserService {
       if (userFound.getVerificationCode()
           .equals(userVerificationCodeRequest.getVerificationCode())) {
         userFound.setIsEmailVerified(true);
+        userFound.setLastLoginDate(LocalDate.now());
         try {
           return userRepository.save(userFound);
         } catch (Exception e) {

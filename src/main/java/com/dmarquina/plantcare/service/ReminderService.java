@@ -13,6 +13,6 @@ public interface ReminderService {
 
   int updateLastDateAction(List<Long> ids,LocalDate lastActionDate);
 
-  int updatePostponedDays(List<Long> ids, Long daysToPostpone);
+  void updatePostponedDays(List<Long> ids, Long daysToPostpone);
 
 }

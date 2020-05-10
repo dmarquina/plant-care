@@ -7,6 +7,7 @@ import com.dmarquina.plantcare.repository.ReminderRepository;
 import com.dmarquina.plantcare.service.ReminderService;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,8 +48,18 @@ public class ReminderServiceImpl implements ReminderService {
 
   @Override
   @Transactional
-  public int updatePostponedDays(List<Long> ids, Long daysToPostpone) {
-    return reminderRepository.updatePostponedDays(ids, daysToPostpone);
+  public void updatePostponedDays(List<Long> ids, Long daysToPostpone) {
+    reminderRepository.findAllById(ids)
+        .forEach(reminder -> {
+          long daysWithOuAction = reminder.getLastDateAction()
+              .until(LocalDate.now(), ChronoUnit.DAYS);
+          long actualDaysToPostpone =
+              (daysWithOuAction - reminder.getFrequencyDays()) + daysToPostpone;
+          reminder.setPostponedDays(actualDaysToPostpone);
+          reminderRepository.save(reminder);
+        });
+
   }
 
 }
+

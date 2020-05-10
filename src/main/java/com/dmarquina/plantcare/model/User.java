@@ -1,5 +1,6 @@
 package com.dmarquina.plantcare.model;
 
+import java.time.LocalDate;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -20,6 +21,7 @@ public class User {
   private String photoUrl;
   private String verificationCode;
   private Boolean isEmailVerified;
+  private LocalDate lastLoginDate;
   private int maxQuantityPlants;
   private int maxQuantityPlantMemories;
 }
