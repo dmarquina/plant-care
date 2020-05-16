@@ -2,6 +2,7 @@ package com.dmarquina.plantcare.service.impl;
 
 import com.dmarquina.plantcare.dto.request.UserEmailLoginRequest;
 import com.dmarquina.plantcare.dto.request.UserVerificationCodeRequest;
+import com.dmarquina.plantcare.model.Memory;
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.model.User;
 import com.dmarquina.plantcare.repository.UserRepository;
@@ -188,6 +189,18 @@ public class UserServiceImpl implements UserService {
       return hasPrivilege;
     } else {
       throw new ResourceNotFoundException(Messages.USER_NOT_FOUND_EXCEPTION_MESSAGE);
+    }
+  }
+
+
+  @Override
+  public List<Memory> findMemoriesByOwnerId(String ownerId) {
+    try {
+      log.info("memory for ownerId: " + ownerId);
+      return userRepository.getMemoriesByUserId(ownerId);
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }
 

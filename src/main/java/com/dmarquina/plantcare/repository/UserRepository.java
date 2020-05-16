@@ -1,5 +1,6 @@
 package com.dmarquina.plantcare.repository;
 
+import com.dmarquina.plantcare.model.Memory;
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.model.User;
 
@@ -24,4 +25,8 @@ public interface UserRepository extends JpaRepository<User, String> {
   @Query(
       "SELECT COUNT(m.id) FROM User u INNER JOIN Plant p ON p.ownerId = u.id RIGHT JOIN Memory m on m.plantId = p.id  WHERE u.id = :ownerId ")
   Integer getMemoriesQuantity(@Param("ownerId") String ownerId);
+
+  @Query(
+      "SELECT m FROM User u INNER JOIN Plant p ON p.ownerId = u.id RIGHT JOIN Memory m on m.plantId = p.id  WHERE u.id = :ownerId ")
+  List<Memory> getMemoriesByUserId(@Param("ownerId") String ownerId);
 }

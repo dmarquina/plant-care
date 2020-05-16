@@ -9,4 +9,5 @@ public interface MemoryService {
   List<Memory> findMemoriesByPlantId(Long plantId);
 
   Memory create(Memory memory);
+
 }

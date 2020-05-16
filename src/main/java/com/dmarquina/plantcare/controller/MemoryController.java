@@ -34,10 +34,12 @@ public class MemoryController {
   @Autowired
   MemoryService memoryService;
 
-  @ApiOperation(value = "Listar memorias", notes = "Servicio para listar memorias")
-  @ApiResponses(value = { @ApiResponse(code = 201, message = "Memorias de plantas listado correctamente"),
-      @ApiResponse(code = 400, message = "Solicitud inválida"),
-      @ApiResponse(code = 500, message = "Error en el servidor") })
+  @ApiOperation(value = "Listar recuerdos por id de planta",
+      notes = "Servicio para listar recuerdos por id de planta")
+  @ApiResponses(
+      value = { @ApiResponse(code = 201, message = "Memorias de plantas listado correctamente"),
+          @ApiResponse(code = 400, message = "Solicitud inválida"),
+          @ApiResponse(code = 500, message = "Error en el servidor") })
   @GetMapping(value = "/{plantId}", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
   public ResponseEntity<List<MemoryResponse>> findMemoriesByPlantId(@PathVariable Long plantId) {
@@ -47,14 +49,17 @@ public class MemoryController {
                                  .collect(Collectors.toList()));
   }
 
-  @ApiOperation(value = "Crear entrada a las memorias", notes = "Servicio para crear entrada al memoria ")
-  @ApiResponses(value = { @ApiResponse(code = 201, message = "Entrada a las memorias creada correctamente"),
-      @ApiResponse(code = 300, message = "No mas espacio para recuerdos"),
-      @ApiResponse(code = 400, message = "Solicitud inválida"),
-      @ApiResponse(code = 500, message = "Error en el servidor") })
+  @ApiOperation(value = "Crear entrada a las recuerdos",
+      notes = "Servicio para crear entrada al memoria ")
+  @ApiResponses(
+      value = { @ApiResponse(code = 201, message = "Entrada a las recuerdos creada correctamente"),
+          @ApiResponse(code = 300, message = "No mas espacio para recuerdos"),
+          @ApiResponse(code = 400, message = "Solicitud inválida"),
+          @ApiResponse(code = 500, message = "Error en el servidor") })
   @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<MemoryResponse> createMemory(@RequestBody @Valid MemoryRequest memoryRequest) {
+  public ResponseEntity<MemoryResponse> createMemory(
+      @RequestBody @Valid MemoryRequest memoryRequest) {
     Memory newMemory = new Memory();
     BeanUtils.copyProperties(memoryRequest, newMemory);
     Memory memoryCreated = memoryService.create(newMemory);

@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface PlantRepository extends JpaRepository<Plant, Long> {
 
-  @ Query(value = "SELECT p FROM Plant p WHERE p.ownerId IN :ownerIds")
+  @Query(value = "SELECT p FROM Plant p WHERE p.ownerId IN :ownerIds")
   List<Plant> getAllPlantsByOwnerIds(@Param("ownerIds") Collection<String> ownerIds);
 
   @Modifying

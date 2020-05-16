@@ -4,6 +4,7 @@ import com.dmarquina.plantcare.dto.request.UserEmailLoginRequest;
 import com.dmarquina.plantcare.dto.request.UserRequest;
 import com.dmarquina.plantcare.dto.request.UserVerificationCodeRequest;
 import com.dmarquina.plantcare.dto.response.GardenPlantResponse;
+import com.dmarquina.plantcare.dto.response.MemoryResponse;
 import com.dmarquina.plantcare.dto.response.PlantResponse;
 import com.dmarquina.plantcare.dto.response.UserResponse;
 import com.dmarquina.plantcare.dto.response.VerifyPrivilegeResponse;
@@ -144,5 +145,20 @@ public class UserController {
     Boolean verifiedUserPrivilege = userService.verifyPrivilege(id, action);
     VerifyPrivilegeResponse privilegeResponse = new VerifyPrivilegeResponse(verifiedUserPrivilege);
     return ResponseEntity.ok(privilegeResponse);
+  }
+
+  @ApiOperation(value = "Obtener la cantidad de recuerdos por id de usuario",
+      notes = "Servicio para obtener la cantidad de recuerdos por id de usuario")
+  @ApiResponses(
+      value = { @ApiResponse(code = 201, message = "Cantidad de recuerdos obtenido correctamente"),
+          @ApiResponse(code = 400, message = "Solicitud inválida"),
+          @ApiResponse(code = 500, message = "Error en el servidor") })
+  @GetMapping(value = "/{ownerId}/memories", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+      produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
+  public ResponseEntity<List<MemoryResponse>> findMemoriesByOwnerId(@PathVariable String ownerId) {
+    return ResponseEntity.ok(userService.findMemoriesByOwnerId(ownerId)
+                                 .stream()
+                                 .map(MemoryResponse::new)
+                                 .collect(Collectors.toList()));
   }
 }
