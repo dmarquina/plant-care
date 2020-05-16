@@ -3,7 +3,7 @@ package com.dmarquina.plantcare.service.impl;
 import com.dmarquina.plantcare.model.User;
 import com.dmarquina.plantcare.repository.UserRepository;
 import com.dmarquina.plantcare.service.UserService;
-import com.dmarquina.plantcare.util.UserEmailVerification;
+import com.dmarquina.plantcare.service.factory.PremiumUserServiceImpl;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantCareServerErrorException;
 import com.dmarquina.plantcare.util.exceptionhandler.ResourceNotFoundException;
 
@@ -21,21 +21,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-public class UserPrivilegeVerification {
+public class PremiumUserPrivilegeVerification {
 
   @TestConfiguration
   static class UserServiceImplTestContextConfiguration {
     @Bean
     public UserService userService() {
-      return new UserServiceImpl();
+      return new PremiumUserServiceImpl();
     }
   }
 
   @Autowired
   UserService userService;
-
-  @MockBean
-  UserEmailVerification userEmailVerification;
 
   @MockBean
   UserRepository userRepository;

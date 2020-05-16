@@ -4,6 +4,7 @@ import com.dmarquina.plantcare.model.Memory;
 import com.dmarquina.plantcare.model.Plant;
 import com.dmarquina.plantcare.model.User;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,9 +17,6 @@ public interface UserRepository extends JpaRepository<User, String> {
       "SELECT DISTINCT p FROM Plant p JOIN FETCH p.reminders WHERE p.ownerId= :ownerId ORDER BY p.id DESC")
   List<Plant> getAllPlantsAndRemindersByOwnerIdOrderByIdDesc(@Param("ownerId") String ownerId);
 
-  @Query("SELECT u FROM User u INNER JOIN Plant p ON p.ownerId = u.id WHERE p.id = :plantId")
-  User getUserByPlantId(@Param("plantId") long plantId);
-
   @Query("SELECT COUNT(p) FROM Plant p WHERE p.ownerId = :ownerId")
   Integer getPlantsQuantity(@Param("ownerId") String ownerId);
 
@@ -29,4 +27,10 @@ public interface UserRepository extends JpaRepository<User, String> {
   @Query(
       "SELECT m FROM User u INNER JOIN Plant p ON p.ownerId = u.id RIGHT JOIN Memory m on m.plantId = p.id  WHERE u.id = :ownerId ")
   List<Memory> getMemoriesByUserId(@Param("ownerId") String ownerId);
+
+  @Query("SELECT m FROM Plant p INNER JOIN Memory m ON p.id = m.plantId WHERE p.id IN :plantIds")
+  List<Memory> getMyPlantsMemories(@Param("plantIds") Collection<Long> plantIds);
+
+  //  @Query("SELECT u FROM User u INNER JOIN Plant p ON p.ownerId = u.id WHERE p.id = :plantId")
+  //  User getUserByPlantId(@Param("plantId") long plantId);
 }

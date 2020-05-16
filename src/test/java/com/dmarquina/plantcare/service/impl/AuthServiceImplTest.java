@@ -3,7 +3,7 @@ package com.dmarquina.plantcare.service.impl;
 import com.dmarquina.plantcare.dto.request.UserVerificationCodeRequest;
 import com.dmarquina.plantcare.model.User;
 import com.dmarquina.plantcare.repository.UserRepository;
-import com.dmarquina.plantcare.service.UserService;
+import com.dmarquina.plantcare.service.AuthService;
 import com.dmarquina.plantcare.util.UserEmailVerification;
 import com.dmarquina.plantcare.util.exceptionhandler.ResourceNotFoundException;
 import com.dmarquina.plantcare.util.exceptionhandler.PlantCareServerErrorException;
@@ -22,18 +22,18 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
-public class UserServiceImplTest {
+public class AuthServiceImplTest {
 
   @TestConfiguration
-  static class UserServiceImplTestContextConfiguration {
+  static class AuthServiceImplTestContextConfiguration {
     @Bean
-    public UserService userService() {
-      return new UserServiceImpl();
+    public AuthService authService() {
+      return new AuthServiceImpl();
     }
   }
 
   @Autowired
-  UserService userService;
+  AuthService authService;
 
   @MockBean
   UserEmailVerification userEmailVerification;
@@ -60,13 +60,13 @@ public class UserServiceImplTest {
 
   @Test(expected = ResourceNotFoundException.class)
   public void userNotFoundInVerificationCode() {
-    userService.verifySignUpCode(new UserVerificationCodeRequest("OYE2", "CODEVER"));
+    authService.verifySignUpCode(new UserVerificationCodeRequest("OYE2", "CODEVER"));
   }
 
   @Test
   public void verificationCodeIsOk() {
     User userVerified =
-        userService.verifySignUpCode(new UserVerificationCodeRequest("OYE1", "CODEVER"));
+        authService.verifySignUpCode(new UserVerificationCodeRequest("OYE1", "CODEVER"));
     Assert.assertTrue(userVerified.getIsEmailVerified());
   }
 
@@ -85,12 +85,12 @@ public class UserServiceImplTest {
     userEmailVerified2.setIsEmailVerified(true);
     Mockito.when(userRepository.save(userEmailVerified2))
         .thenThrow(PlantCareServerErrorException.class);
-    userService.verifySignUpCode(new UserVerificationCodeRequest("OYE2", "CODEVER"));
+    authService.verifySignUpCode(new UserVerificationCodeRequest("OYE2", "CODEVER"));
   }
 
   @Test(expected = ResourceNotFoundException.class)
   public void verificationCodeIsNotOk() {
-    userService.verifySignUpCode(new UserVerificationCodeRequest("OYE1", "CODELOV"));
+    authService.verifySignUpCode(new UserVerificationCodeRequest("OYE1", "CODELOV"));
   }
 
 

@@ -11,6 +11,4 @@ public class Constants {
   public static final String CREATE_NEW_PLANT_ACTION = "createPlant";
   public static final String CREATE_NEW_MEMORY_ACTION = "createMemory";
 
-
-
 }
