@@ -2,6 +2,8 @@ package com.dmarquina.plantcare.dto.response;
 
 import com.dmarquina.plantcare.model.User;
 
+import java.time.LocalDate;
+
 import lombok.Data;
 
 import org.springframework.beans.BeanUtils;
@@ -16,8 +18,13 @@ public class UserResponse {
   private int maxQuantityPlantMemories;
   private String displayName;
   private String photoUrl;
+  private LocalDate subscriptionEndDate;
 
   public UserResponse(User user) {
     BeanUtils.copyProperties(user, this);
+    if (user.getSubscription() != null) {
+      this.setSubscriptionEndDate(user.getSubscription()
+                                      .getEndDate());
+    }
   }
 }

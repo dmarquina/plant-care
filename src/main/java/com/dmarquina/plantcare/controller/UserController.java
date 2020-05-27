@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,13 +67,14 @@ public class UserController {
       value = { @ApiResponse(code = 201, message = "Cantidad de recuerdos obtenido correctamente"),
           @ApiResponse(code = 400, message = "Solicitud inválida"),
           @ApiResponse(code = 500, message = "Error en el servidor") })
-  @GetMapping(value = "/{ownerId}/memories", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
+  @GetMapping(value = "/{id}/memories", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE,
       produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-  public ResponseEntity<List<MemoryResponse>> findMemoriesByOwnerId(@PathVariable String ownerId) {
-    userService = userServiceFactory.getUserServiceImpl(ownerId);
-    return ResponseEntity.ok(userService.findMemoriesByOwnerId(ownerId)
+  public ResponseEntity<List<MemoryResponse>> findMemoriesByOwnerId(@PathVariable String id) {
+    userService = userServiceFactory.getUserServiceImpl(id);
+    return ResponseEntity.ok(userService.findMemoriesByOwnerId(id)
                                  .stream()
                                  .map(MemoryResponse::new)
                                  .collect(Collectors.toList()));
   }
+
 }
