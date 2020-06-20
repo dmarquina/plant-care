@@ -68,7 +68,7 @@ public class PlantServiceImpl implements PlantService {
     try {
       plantCreated = plantRepository.saveAndFlush(plant);
     } catch (Exception e) {
-      log.info("create(Plant plant) - Hubo un problema al crear la planta");
+      log.info("makeSale(Plant plant) - Hubo un problema al crear la planta");
       log.info("plant: " + plant);
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
@@ -76,7 +76,7 @@ public class PlantServiceImpl implements PlantService {
     try {
       return plantRepository.save(plantCreated);
     } catch (Exception e) {
-      log.info("create(Plant plant) - Hubo un problema al crear la planta con foto");
+      log.info("makeSale(Plant plant) - Hubo un problema al crear la planta con foto");
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }

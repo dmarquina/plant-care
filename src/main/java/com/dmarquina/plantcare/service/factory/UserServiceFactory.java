@@ -22,9 +22,9 @@ public class UserServiceFactory {
     User u = userRepository.findById(userId)
         .get();
     if (u != null) {
-      return freeUserService;
-    } else {
       return premiumUserService;
+    } else {
+      return freeUserService;
     }
   }
 }

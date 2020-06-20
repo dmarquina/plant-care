@@ -41,7 +41,7 @@ public class MemoryServiceImpl implements MemoryService {
     try {
       memoryCreated = memoryRepository.saveAndFlush(memory);
     } catch (Exception e) {
-      log.info("create(Memory memory) - Hubo un problema al crear el recuerdo");
+      log.info("makeSale(Memory memory) - Hubo un problema al crear el recuerdo");
       log.info("memory: " + memory);
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
@@ -49,7 +49,7 @@ public class MemoryServiceImpl implements MemoryService {
     try {
       return memoryRepository.save(memoryCreated);
     } catch (Exception e) {
-      log.info("create(Memory memory) - Hubo un problema al crear el recuerdo con foto");
+      log.info("makeSale(Memory memory) - Hubo un problema al crear el recuerdo con foto");
       throw new PlantCareServerErrorException(Messages.INTERNAL_SERVER_EXCEPTION_MESSAGE);
     }
   }

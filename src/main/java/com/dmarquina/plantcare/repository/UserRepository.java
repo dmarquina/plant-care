@@ -31,6 +31,8 @@ public interface UserRepository extends JpaRepository<User, String> {
   @Query("SELECT m FROM Plant p INNER JOIN Memory m ON p.id = m.plantId WHERE p.id IN :plantIds")
   List<Memory> getMyPlantsMemories(@Param("plantIds") Collection<Long> plantIds);
 
+
+
   //  @Query("SELECT u FROM User u INNER JOIN Plant p ON p.ownerId = u.id WHERE p.id = :plantId")
   //  User getUserByPlantId(@Param("plantId") long plantId);
 }

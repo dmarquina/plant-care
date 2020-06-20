@@ -79,17 +79,20 @@ public class AuthServiceImpl implements AuthService {
   }
 
   private User facebookLogin(User userFound, User userRequest) {
-    if (userRequest.getDeviceToken() != null && !userRequest.getDeviceToken()
-        .equals(userFound.getDeviceToken())) {
-      userFound.setDeviceToken(userRequest.getDeviceToken());
+    if (userFound != null) {
+      if (userRequest.getDeviceToken() != null && !userRequest.getDeviceToken()
+          .equals(userFound.getDeviceToken())) {
+        userFound.setDeviceToken(userRequest.getDeviceToken());
+      }
+      userFound.setLastLoginDate(LocalDate.now());
+      try {
+        userRepository.save(userFound);
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw e;
+      }
     }
-    userFound.setLastLoginDate(LocalDate.now());
-    try {
-      userRepository.save(userFound);
-    } catch (Exception e) {
-      e.printStackTrace();
-      throw e;
-    }
+
     return userFound;
   }
 
