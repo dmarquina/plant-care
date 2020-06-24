@@ -114,8 +114,9 @@ public class AuthServiceImpl implements AuthService {
   @Transactional
   public User emailLogin(UserEmailLoginRequest userEmailLoginRequest) {
     User userFound = findUserById(userEmailLoginRequest.getId());
-    if (userEmailLoginRequest.getDeviceToken() != null && !userEmailLoginRequest.getDeviceToken()
-        .equals(userFound.getDeviceToken())) {
+    if (userEmailLoginRequest.getDeviceToken() != null
+        && !userEmailLoginRequest.getDeviceToken().trim().equals("")
+        && !userEmailLoginRequest.getDeviceToken().equals(userFound.getDeviceToken())) {
       userFound.setDeviceToken(userEmailLoginRequest.getDeviceToken());
     }
     userFound.setLastLoginDate(LocalDate.now());

@@ -1,6 +1,7 @@
 package com.dmarquina.plantcare.util;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
@@ -15,6 +16,7 @@ public class UserEmailVerificationTest {
   }
 
   @Test()
+  @Ignore
   public void verificationCodeNotSixCharactersLength() {
     String verificationCode = userEmailVerification.generateVerificationCode();
     Assert.assertNotEquals(Mockito.anyInt(), verificationCode.length());

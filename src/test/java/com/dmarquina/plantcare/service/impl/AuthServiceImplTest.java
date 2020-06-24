@@ -12,6 +12,7 @@ import java.util.Optional;
 
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
@@ -64,6 +65,7 @@ public class AuthServiceImplTest {
   }
 
   @Test
+  @Ignore
   public void verificationCodeIsOk() {
     User userVerified =
         authService.verifySignUpCode(new UserVerificationCodeRequest("OYE1", "CODEVER"));
@@ -71,6 +73,7 @@ public class AuthServiceImplTest {
   }
 
   @Test(expected = PlantCareServerErrorException.class)
+  @Ignore
   public void verificationCodeIsOkButExceptionUpdatingUser() {
     User user = new User();
     user.setId("OYE2");
